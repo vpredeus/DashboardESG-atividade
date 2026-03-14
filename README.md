@@ -60,15 +60,11 @@ Isso permitirá identificar **quais projetos geraram maior impacto social ou amb
 
 ## ⚙️ Tecnologias Utilizadas
 
-*A definir*
-
-Possíveis tecnologias que poderão ser utilizadas no projeto:
-
 - JavaScript
-- Python
 - HTML
 - CSS
-- Biblioteca de gráficos (ex: Chart.js)
+
+- *Python
 
 ---
 
