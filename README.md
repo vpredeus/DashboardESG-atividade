@@ -94,7 +94,23 @@ Cada projeto aparecerá como um elemento no gráfico, permitindo observar facilm
 
 Projeto desenvolvido por:
 
-- A definir
+Frontend
+- Ana Paula
+- Enzo Dutra
+- Rafael Brito
+- Arthur Augusto
+
+API:
+- Fernando
+- Nicolas
+- Henrique
+
+Github: 
+- Eduardo Vilaronga
+- João Victor Predeus
+
+Admin: 
+- Luiz Gustavo
 
 ---
 
