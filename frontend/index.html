@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard ESG</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family: Arial;
+background:#0A0F1C;
+color:white;
+margin:0;
+padding:20px;
+}
+
+.container{
+width:90%;
+margin:auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #10B981;
+}
+
+header div:last-child {
+    color: #94A3B8;
+}
+
+/* PROJETOS */
+.top-section{
+background:#161B2D;
+padding:20px;
+border-radius:10px;
+margin-bottom:30px;
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 240px); /* 🔥 5 imagens */
+    gap: 20px;
+    justify-content: center;
+}
+
+.project-card {
+    width: 240px;
+    height: 160px; /* 🔥 mais alto pra não cortar tanto */
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.project-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* mantém bonito */
+}
+
+
+/* GRÁFICOS */
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+margin-bottom:20px;
+}
+
+.chart-card{
+background:#161B2D;
+padding:20px;
+border-radius:10px;
+}
+
+.chart-container{
+    position: relative;
+    width: 100%;
+    margin: auto;
+}
+
+#graficoLinha,
+#graficoODS {
+    max-height: 300px;
+}
+
+#graficoPizza,
+#graficoRadar {
+    max-height: 400px;
+}
+
+canvas{
+    width: 100% !important;
+    height: auto !important;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<div class="logo"><span>ESG</span> HUB</div>
+<div>SISTEMA DE GESTÃO - 2026</div>
+</header>
+
+<section class="top-section">
+<h2>Projetos</h2>
+<div class="project-grid">
+<div class="project-card"><img src="images/proj_edu.jpeg" alt=""></div>
+<div class="project-card"><img src="images/proj_info.jpeg" alt=""></div>
+<div class="project-card"><img src="images/proj_gestao.jpeg" alt=""></div>
+<div class="project-card"><img src="images/proj_eng.jpeg" alt=""></div>
+<div class="project-card"><img src="images/proj_saude.jpeg" alt=""></div>
+
+</div>
+</section>
+
+<div class="charts-wrapper">
+
+<div class="row">
+<div class="chart-card">
+<h3>Evolução</h3>
+<div class="chart-container">
+<canvas id="graficoLinha"></canvas>
+</div>
+</div>
+
+<div class="chart-card">
+<h3>ODS</h3>
+<div class="chart-container">
+<canvas id="graficoODS"></canvas>
+</div>
+</div>
+</div>
+
+<div class="row">
+<div class="chart-card">
+<h3>Pizza</h3>
+<div class="chart-container">
+<canvas id="graficoPizza"></canvas>
+</div>
+</div>
+
+<div class="chart-card">
+<h3>Radar</h3>
+<div class="chart-container">
+<canvas id="graficoRadar"></canvas>
+</div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<footer style="text-align:center;margin-top:40px;">
+© 2026 ESG HUB
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>

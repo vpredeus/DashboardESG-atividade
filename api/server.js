@@ -1,17 +1,35 @@
 import express from "express";
 import cors from "cors";
+import fs from "fs";
+import path from "path";
 
 const app = express();
+const porta = 5000;
 
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
-const porta = 5000;
+const caminhoProjetos = path.resolve("../data/projetos.json");
+const caminhoIndicadores = path.resolve("data/dados.json");
 
-const router = express.Router()
-//pode continuar aqui, ou criar outros arquivos pro que falta
-//a função que lê arquivos json é fs.readFileSync, da uma pesquisada dps e se precisar de ajuma me manda mensagem(Fernando)
+app.get("/projetos", (req, res) => {
+  try {
+    const dados = fs.readFileSync(caminhoProjetos, "utf-8");
+    res.json(JSON.parse(dados));
+  } catch (erro) {
+    res.status(500).json({ erro: "Erro ao ler projetos" });
+  }
+});
+
+app.get("/indicadores", (req, res) => {
+  try {
+    const dados = fs.readFileSync(caminhoIndicadores, "utf-8");
+    res.json(JSON.parse(dados));
+  } catch (erro) {
+    res.status(500).json({ erro: "Erro ao ler indicadores" });
+  }
+});
 
 app.listen(porta, () => {
-    console.log("Rodando na porta 5000");
+  console.log(`Servidor rodando em http://localhost:${porta}`);
 });
