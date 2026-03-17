@@ -64,8 +64,6 @@ Isso permitirá identificar **quais projetos geraram maior impacto social ou amb
 - HTML
 - CSS
 
-- *Python
-
 ---
 
 ## 🚀 Funcionalidades
