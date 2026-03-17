@@ -14,5 +14,8 @@ async function bootstrap() {
     swagger_1.SwaggerModule.setup('api', app, document);
     await app.listen(3000);
 }
-bootstrap();
+bootstrap().catch((err) => {
+    console.error('Erro ao iniciar a aplicação:', err);
+    process.exit(1);
+});
 //# sourceMappingURL=main.js.map

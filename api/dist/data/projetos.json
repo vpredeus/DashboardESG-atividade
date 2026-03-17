@@ -1,0 +1,24 @@
+{
+    "indicadores": [
+        {
+            "projeto": "Horta Comunitária",
+            "categoria": "Ambiental",
+            "impacto": 120
+        },
+        {
+            "projeto": "Capacitação Profissional",
+            "categoria": "Social",
+            "impacto": 80
+        },
+        {
+            "projeto": "Reciclagem Urbana",
+            "categoria": "Ambiental",
+            "impacto": 150
+        },
+        {
+            "projeto": "Inclusão Digital",
+            "categoria": "Social",
+            "impacto": 60
+        }
+    ]
+}

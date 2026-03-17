@@ -5,14 +5,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
+const projetos_json_1 = __importDefault(require("../data/projetos.json"));
 let AppService = class AppService {
-    getHello() {
-        const jsonString = '{ "indicadores": [ { "projeto": "Horta Comunitária", "categoria": "Ambiental", "impacto": 120 }, { "projeto": "Capacitação Profissional", "categoria": "Social", "impacto": 80 }, { "projeto": "Reciclagem Urbana", "categoria": "Ambiental", "impacto": 150 }, { "projeto": "Inclusão Digital", "categoria": "Social", "impacto": 60 } ] }';
-        const obj = JSON.parse(jsonString);
-        return obj;
+    getDados() {
+        const jsonString = projetos_json_1.default;
+        return jsonString;
     }
 };
 exports.AppService = AppService;
