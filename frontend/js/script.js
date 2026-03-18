@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/projetos";
+const API_URL = "http://localhost:3000/indicadores";
 
 // ── Dados de pesquisa locais ──────────────────
 const PESQUISA = {
