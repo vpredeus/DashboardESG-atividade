@@ -76,25 +76,36 @@ Isso permitirá identificar **quais projetos geraram maior impacto social ou amb
 
 ---
 
-## 🚀 Como rodar o projeto
+## ⚙️ Como Rodar o Projeto
 
-Para executar o projeto corretamente, é necessário abrir dois terminais, um para a API e outro para o Frontend.
+Para executar o projeto, é necessário abrir **dois terminais**: um para a API e outro para o Frontend.
 
-🔹 1. Rodando a API (NestJS)
+### 1️⃣ Rodando a API (NestJS)
 
-No primeiro terminal, acesse a pasta da API e execute:
+No terminal, acesse a pasta da API:
+Instale a dependência
 
+```bash
 npm install
+```
+Execute a API em modo de desenvolvimento:
+
+```bash
 npm run start:dev
+```
 
-Alternativa:
+A API estará disponível em http://localhost:3000 (ou outra porta configurada no projeto).
 
-npm run start
-🔹 2. Rodando o Frontend
+### 2️⃣ Rodando o Frontend
 
-No segundo terminal, na pasta do frontend:
+No outro terminal, acesse a pasta do frontend:
 
+Inicie o servidor local com o serve:
+
+```bash
 npx serve .
+```
+Após isso, abra o navegador e acesse o endereço mostrado pelo terminal para visualizar o dashboard.
 
 ---
 
