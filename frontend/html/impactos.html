@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENIAC ESG – Impactos e Valores</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="../images/esg_logo.png" type="image/png" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <span class="logo-mark">⬡</span>
+        ENIAC <span class="logo-accent">ESG HUB</span>
+      </div>
+      <nav id="menu">
+        <a href="../index.html">Projetos &amp; Dashboard</a>
+        <a href="quem-somos.html">Quem Somos</a>
+        <a href="impactos.html" class="active">Impactos e Valores</a>
+      </nav>
+      <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    </header>
+
+    <section class="hero hero-short">
+      <div class="hero-bg-grid"></div>
+      <div class="hero-content">
+        <span class="hero-tag">Transparência de Dados</span>
+        <h1 class="hero-title">Impactos e <em>Valores</em></h1>
+        <p class="hero-subtitle">
+          Cada iniciativa é medida, avaliada e reportada com rigor. Conheça os
+          dados, contextos e referências que embasam nossas ações.
+        </p>
+      </div>
+    </section>
+
+    <!-- Loading / Erro próprios desta página -->
+    <div id="imp-loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Carregando dados da API...</p>
+    </div>
+    <div id="imp-error" class="error-state" style="display: none">
+      <span class="error-icon">⚠️</span>
+      <p id="imp-error-msg">Não foi possível conectar à API.</p>
+      <button onclick="carregarImpactos()">Tentar novamente</button>
+    </div>
+
+    <!-- Conteúdo — oculto até API responder -->
+    <div id="imp-content" style="display: none">
+      <!-- Projetos com textos de pesquisa -->
+      <section class="section-label">
+        <div class="section-label-inner">
+          <span class="pill">Análise por Projeto</span>
+          <h2>Cada Iniciativa em Detalhe</h2>
+          <p>
+            Textos de pesquisa, impactos mensurados e referências bibliográficas
+            de cada projeto do portfólio ESG.
+          </p>
+        </div>
+      </section>
+      <main class="impactos-main" id="impactos-lista"></main>
+
+      <!-- Gráficos -->
+      <section class="section-label" style="padding-top: 20px">
+        <div class="section-label-inner">
+          <span class="pill">Análise Visual</span>
+          <h2>Distribuição de Impacto ESG</h2>
+          <p>
+            Visualização consolidada dos dados de impacto por categoria e por
+            projeto.
+          </p>
+        </div>
+      </section>
+
+      <div class="dashboard-container">
+        <div class="grid-layout">
+          <div class="info-text">
+            <h2>
+              Nossos Valores <br /><span class="text-accent">Mensurados</span>
+            </h2>
+            <p>
+              Cada projeto é avaliado pelo seu
+              <strong>Impacto de Valor</strong>, garantindo que as ações sociais
+              e ambientais transformem a realidade local de forma concreta e
+              verificável.
+            </p>
+            <div
+              class="legend-box"
+              id="legend-categorias"
+              style="margin-top: 20px"
+            ></div>
+          </div>
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Impacto por Categoria</span>
+              <span class="chart-badge">Pizza</span>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="categoriaChart"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('categoriaChart', 'impacto_categorias')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="grid-layout">
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Impacto Individual por Projeto</span>
+              <span class="chart-badge">Barras</span>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="impactosBar"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('impactosBar', 'impacto_projetos')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
+          </div>
+          <div class="info-text">
+            <h2>
+              Alcance Social <br /><span class="text-accent">e Ambiental</span>
+            </h2>
+            <p>
+              O gráfico demonstra os pontos de impacto de cada iniciativa
+              individualmente, permitindo comparar o alcance de cada projeto
+              dentro do portfólio ESG.
+            </p>
+            <a href="../index.html" class="cta-btn">← Ver Dashboard</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bibliografia -->
+      <section class="section-label" style="padding-top: 20px">
+        <div class="section-label-inner">
+          <span class="pill">Fontes</span>
+          <h2>Referências Bibliográficas</h2>
+          <p>
+            Todas as informações apresentadas foram embasadas em pesquisas de
+            fontes confiáveis.
+          </p>
+        </div>
+      </section>
+      <!-- Ticker de referências bibliográficas -->
+      <div class="bib-ticker-wrap">
+        <div class="bib-ticker" id="bibliografia-lista"></div>
+      </div>
+    </div>
+    <!-- fim #imp-content -->
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="logo-mark">⬡</span> ENIAC ESG HUB
+        </div>
+        <p class="footer-desc">
+          Comprometidos com um futuro mais justo e conectado.
+        </p>
+        <div class="footer-links">
+          <a href="../index.html">Projetos &amp; Dashboard</a>
+          <a href="quem-somos.html">Quem Somos</a>
+          <a href="impactos.html">Impactos e Valores</a>
+        </div>
+        <p class="footer-copy">
+          ©
+          <script>
+            document.write(new Date().getFullYear());
+          </script>
+          ENIAC ESG HUB · Todos os direitos reservados
+        </p>
+      </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+  </body>
+</html>
