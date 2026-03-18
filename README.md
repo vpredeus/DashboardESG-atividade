@@ -76,6 +76,28 @@ Isso permitirá identificar **quais projetos geraram maior impacto social ou amb
 
 ---
 
+## 🚀 Como rodar o projeto
+
+Para executar o projeto corretamente, é necessário abrir dois terminais, um para a API e outro para o Frontend.
+
+🔹 1. Rodando a API (NestJS)
+
+No primeiro terminal, acesse a pasta da API e execute:
+
+npm install
+npm run start:dev
+
+Alternativa:
+
+npm run start
+🔹 2. Rodando o Frontend
+
+No segundo terminal, na pasta do frontend:
+
+npx serve .
+
+---
+
 ## 📈 Resultado Esperado
 
 Ao final do projeto, o sistema deverá apresentar um **gráfico visual** mostrando o impacto gerado pelos projetos ESG.
@@ -89,22 +111,22 @@ Cada projeto aparecerá como um elemento no gráfico, permitindo observar facilm
 Projeto desenvolvido por:
 
 Frontend
-- Ana Paula
-- Enzo Dutra
-- Rafael Brito
-- Arthur Augusto
+- Ana Paula (@Itsanapaula) 
+- Enzo Dutra (@Enzo-Dutra)
+- Rafael Brito (@Rafa-A-Brito)
+- Arthur Augusto (@ArthurBigodeAug)
 
 API:
-- Fernando
-- Nicolas
-- Henrique
+- Fernando (@F3rCar)
+- Nicolas (@Fladenz)
+- Henrique (@Gimenes77)
 
 Github: 
-- Eduardo Vilaronga
-- João Victor Predeus
+- Eduardo Vilaronga (@vilarongadiaseduardo-glitch)
+- João Victor Predeus (@vpredeus)
 
 Admin: 
-- Luiz Gustavo
+- Luiz Gustavo (@luiz030609)
 
 ---
 
