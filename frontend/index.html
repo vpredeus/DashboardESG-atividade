@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENIAC ESG – Dashboard</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="./images/esg_logo.png" type="image/png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <span class="logo-mark">⬡</span>
+        ENIAC <span class="logo-accent">ESG HUB</span>
+      </div>
+      <nav id="menu">
+        <a href="index.html" class="active">Projetos &amp; Dashboard</a>
+        <a href="./html/quem-somos.html">Quem Somos</a>
+        <a href="./html/impactos.html">Impactos e Valores</a>
+      </nav>
+      <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-bg-grid"></div>
+      <div class="hero-content" data-aos="fade-right" data-aos-duration="550">
+        <span class="hero-tag">Sustentabilidade em Ação</span>
+        <h1 class="hero-title">Iniciativas que <br /><em>Transformam</em></h1>
+        <p class="hero-subtitle">
+          Gerenciamos projetos sociais e ambientais com foco em impacto real,
+          transparência analítica e compreensão de um futuro responsável.
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num" id="stat-total">—</span
+            ><span class="stat-label">Projetos Ativos</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" id="stat-impacto">—</span
+            ><span class="stat-label">Pontos de Impacto</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" id="stat-cats">—</span
+            ><span class="stat-label">Categorias ESG</span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="hero-visual"
+        data-aos="fade-left"
+        data-aos-duration="550"
+        data-aos-delay="100"
+      >
+        <!-- Hexágono externo — gira rápido -->
+        <div class="orbit-ring ring-1">
+          <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+            <polygon
+              points="110,4 206,57 206,163 110,216 14,163 14,57"
+              fill="none"
+              stroke="rgba(255,215,0,0.22)"
+              stroke-width="1.2"
+            />
+            <circle
+              cx="110"
+              cy="4"
+              r="5"
+              fill="#ffd700"
+              style="filter: drop-shadow(0 0 6px #ffd700)"
+            />
+          </svg>
+        </div>
+
+        <!-- Hexágono interno — estático, orbe vai e volta -->
+        <div class="orbit-ring ring-2">
+          <svg
+            viewBox="0 0 154 154"
+            xmlns="http://www.w3.org/2000/svg"
+            style="overflow: visible"
+          >
+            <polygon
+              points="77,3 144,40 144,114 77,151 10,114 10,40"
+              fill="none"
+              stroke="rgba(255,215,0,0.38)"
+              stroke-width="1.2"
+            />
+            <!-- Orbe animado com offset-path percorrendo o hexágono -->
+            <circle
+              r="4"
+              fill="#ffd700"
+              class="orbe-interno"
+              style="filter: drop-shadow(0 0 5px #ffd700)"
+            />
+          </svg>
+        </div>
+
+        <div class="orbit-center">ESG</div>
+      </div>
+    </section>
+
+    <!-- Estados de carregamento -->
+    <div id="loading-state" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Carregando dados da API...</p>
+    </div>
+    <div id="error-state" class="error-state" style="display: none">
+      <span class="error-icon">⚠️</span>
+      <p id="error-msg">Não foi possível conectar à API.</p>
+      <button onclick="carregarDados()">Tentar novamente</button>
+    </div>
+
+    <div id="main-content" style="display: none">
+      <!-- ── PORTFÓLIO: imagens filtráveis + cards ── -->
+      <section class="section-label">
+        <div
+          class="section-label-inner"
+          data-aos="fade-up"
+          data-aos-duration="550"
+        >
+          <span class="pill">Portfólio de Iniciativas</span>
+          <h2>Projetos por Área</h2>
+          <p>Clique em uma área para filtrar os projetos abaixo.</p>
+        </div>
+      </section>
+
+      <div class="portfolio-wrapper">
+        <!-- Botões de área (imagens) -->
+        <div
+          class="area-filters"
+          id="area-filters"
+          data-aos="zoom-in"
+          data-aos-duration="550"
+          data-aos-delay="60"
+        ></div>
+        <!-- Cards filtráveis -->
+        <div
+          class="cards-portfolio"
+          id="cards-portfolio"
+          data-aos="fade-up"
+          data-aos-duration="550"
+          data-aos-delay="100"
+        ></div>
+      </div>
+
+      <!-- ── DASHBOARD ── -->
+      <section class="section-label" style="margin-top: 0">
+        <div
+          class="section-label-inner"
+          data-aos="fade-up"
+          data-aos-duration="550"
+        >
+          <span class="pill">Métricas</span>
+          <h2>Dashboard de Impacto</h2>
+          <p>
+            Consolidação visual dos dados por evolução, ODS, categoria e área de
+            atuação.
+          </p>
+        </div>
+      </section>
+
+      <main class="dashboard-container dashboard-multi">
+        <div
+          class="kpi-row"
+          id="kpi-row"
+          data-aos="zoom-in"
+          data-aos-duration="550"
+          data-aos-delay="60"
+        ></div>
+
+        <div class="dash-row">
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Evolução de Projetos por Ano</span
+              ><span class="chart-badge">Linha</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              style="height: 260px"
+              data-aos="fade-right"
+              data-aos-duration="550"
+            >
+              <canvas id="graficoLinha"></canvas>
+            </div>
+          </div>
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Projetos por ODS</span
+              ><span class="chart-badge">Barras</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              style="height: 260px"
+              data-aos="fade-left"
+              data-aos-duration="550"
+              data-aos-delay="100"
+            >
+              <canvas id="graficoODS"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('graficoODS', 'projetos_por_ods')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-row" style="margin-top: 24px">
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Distribuição por Categoria</span
+              ><span class="chart-badge">Pizza</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              style="height: 320px"
+              data-aos="flip-right"
+              data-aos-duration="550"
+            >
+              <canvas id="graficoPizza"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('graficoPizza', 'categorias')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
+          </div>
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Projetos por Área de Atuação</span
+              ><span class="chart-badge">Radar</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              style="height: 320px"
+              data-aos="flip-left"
+              data-aos-duration="550"
+              data-aos-delay="100"
+            >
+              <canvas id="graficoRadar"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px">
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Pontos de Impacto por Projeto</span
+              ><span class="chart-badge">Barras</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              style="height: 280px"
+              data-aos="fade-up"
+              data-aos-duration="550"
+              data-aos-delay="60"
+            >
+              <canvas id="graficoImpacto"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('graficoImpacto', 'impacto_projetos')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand" data-aos="fade-up" data-aos-duration="550">
+          <span class="logo-mark">⬡</span> ENIAC ESG HUB
+        </div>
+        <p class="footer-desc">
+          Comprometidos com um futuro mais justo e conectado.
+        </p>
+        <div class="footer-links">
+          <a href="index.html">Projetos &amp; Dashboard</a>
+          <a href="./html/quem-somos.html">Quem Somos</a>
+          <a href="./html/impactos.html">Impactos e Valores</a>
+        </div>
+        <p class="footer-copy">
+          ©
+          <script>
+            document.write(new Date().getFullYear());
+          </script>
+          ENIAC ESG HUB · Todos os direitos reservados
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 550,
+        easing: "ease-out-cubic",
+        once: true,
+        offset: 50,
+        delay: 0,
+      });
+    </script>
+    <script src="./js/script.js"></script>
+  </body>
+</html>
