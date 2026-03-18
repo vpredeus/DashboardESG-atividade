@@ -628,6 +628,9 @@ function renderIndex(ind) {
       const color = CHART_COLORS[i % CHART_COLORS.length];
       const card = document.createElement("div");
       card.className = "card";
+      card.setAttribute("data-aos", "fade-up");
+      card.setAttribute("data-aos-duration", "500");
+      card.setAttribute("data-aos-delay", String(Math.min(i * 50, 300)));
       card.innerHTML = `
         <div class="card-inner">
           <div class="card-front" style="border-color:${color}44;">
@@ -647,12 +650,17 @@ function renderIndex(ind) {
     filtersEl.querySelectorAll(".area-filter-btn").forEach((b) => {
       b.classList.toggle("active", b.dataset.area === filtro);
     });
+    // Notifica AOS dos novos elementos
+    if (typeof AOS !== "undefined") AOS.refresh();
   }
 
   // Botão "Todos"
   const btnTodos = document.createElement("button");
   btnTodos.className = "area-filter-btn active";
   btnTodos.dataset.area = "todos";
+  btnTodos.setAttribute("data-aos", "zoom-in");
+  btnTodos.setAttribute("data-aos-duration", "550");
+  btnTodos.setAttribute("data-aos-delay", "0");
   btnTodos.innerHTML = `
     <div class="area-img-wrap" style="background:linear-gradient(135deg,#1f2b6c,#263380);">
       <div class="area-img-overlay">
@@ -663,12 +671,15 @@ function renderIndex(ind) {
   btnTodos.onclick = () => renderCards("todos");
   filtersEl.appendChild(btnTodos);
 
-  areas.forEach((area) => {
+  areas.forEach((area, idx) => {
     const count = ind.filter((p) => p.area === area).length;
     const img = AREA_IMG[area] || "";
     const btn = document.createElement("button");
     btn.className = "area-filter-btn";
     btn.dataset.area = area;
+    btn.setAttribute("data-aos", "zoom-in");
+    btn.setAttribute("data-aos-duration", "550");
+    btn.setAttribute("data-aos-delay", String(Math.min((idx + 1) * 60, 300)));
     btn.innerHTML = `
       <div class="area-img-wrap">
         <img src="${img}" alt="${area}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
@@ -689,14 +700,14 @@ function renderIndex(ind) {
   if (kpiRow) {
     const cats = [...new Set(ind.map((p) => p.categoria))];
     kpiRow.innerHTML = [
-      ...cats.map((cat) => {
+      ...cats.map((cat, i) => {
         const m = CAT_META[cat] || { cor: "#888", icone: "📌" };
         const pts = ind
           .filter((p) => p.categoria === cat)
           .reduce((s, p) => s + p.impacto, 0);
-        return `<div class="kpi-card" style="border-color:${m.cor}33;"><span class="kpi-icon">${m.icone}</span><span class="kpi-num" style="color:${m.cor};">${pts}</span><span class="kpi-label">pts ${cat}</span></div>`;
+        return `<div class="kpi-card" style="border-color:${m.cor}33;" data-aos="zoom-in" data-aos-duration="550" data-aos-delay="${i * 80}"><span class="kpi-icon">${m.icone}</span><span class="kpi-num" style="color:${m.cor};">${pts}</span><span class="kpi-label">pts ${cat}</span></div>`;
       }),
-      `<div class="kpi-card" style="border-color:#ffd70033;"><span class="kpi-icon">🏆</span><span class="kpi-projeto">${ind.reduce((a, b) => (b.impacto > a.impacto ? b : a)).projeto}</span><span class="kpi-label">Maior Impacto</span></div>`,
+      `<div class="kpi-card" style="border-color:#ffd70033;" data-aos="zoom-in" data-aos-duration="550" data-aos-delay="${cats.length * 80}"><span class="kpi-icon">🏆</span><span class="kpi-projeto">${ind.reduce((a, b) => (b.impacto > a.impacto ? b : a)).projeto}</span><span class="kpi-label">Maior Impacto</span></div>`,
     ].join("");
   }
 
@@ -771,6 +782,9 @@ function renderIndex(ind) {
     ind.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]),
     false,
   );
+
+  // Notifica AOS de todos os elementos criados dinamicamente
+  if (typeof AOS !== "undefined") setTimeout(() => AOS.refresh(), 100);
 }
 
 // ── RENDER IMPACTOS ───────────────────────────
@@ -778,13 +792,16 @@ function renderImpactos(ind) {
   const lista = document.getElementById("impactos-lista");
   if (!lista) return;
 
-  ind.forEach((p) => {
+  ind.forEach((p, idx) => {
     const q = PESQUISA[p.projeto] || {};
     const cor = q.cor || "#1f2b6c";
     const icone = q.icone || "📌";
     const odsArr = [p.ods].filter(Boolean);
     const sec = document.createElement("section");
     sec.className = "impacto-section";
+    sec.setAttribute("data-aos", "fade-up");
+    sec.setAttribute("data-aos-duration", "550");
+    sec.setAttribute("data-aos-delay", String(Math.min(idx * 60, 200)));
     sec.innerHTML = `
       <div class="impacto-sec-header" style="border-left:5px solid ${cor};">
         <div class="impacto-sec-top">
@@ -861,6 +878,9 @@ function renderImpactos(ind) {
     // Duplica para loop infinito suave
     bibEl.innerHTML = itens.join("") + itens.join("");
   }
+
+  // Notifica AOS dos elementos dinâmicos
+  if (typeof AOS !== "undefined") setTimeout(() => AOS.refresh(), 100);
 }
 
 // ── FETCH ─────────────────────────────────────

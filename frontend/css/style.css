@@ -2546,3 +2546,27 @@ nav a.active {
     height: 70px;
   }
 }
+
+/* ══ SCROLLBAR ═══════════════════════════════ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--eniac-azul-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--eniac-amarelo);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--eniac-amarelo-soft);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--eniac-amarelo) var(--eniac-azul-deep);
+}

@@ -12,6 +12,10 @@
       rel="stylesheet"
     />
     <link rel="icon" href="./images/esg_logo.png" type="image/png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -30,7 +34,7 @@
 
     <section class="hero">
       <div class="hero-bg-grid"></div>
-      <div class="hero-content">
+      <div class="hero-content" data-aos="fade-right" data-aos-duration="550">
         <span class="hero-tag">Sustentabilidade em Ação</span>
         <h1 class="hero-title">Iniciativas que <br /><em>Transformam</em></h1>
         <p class="hero-subtitle">
@@ -54,7 +58,12 @@
           </div>
         </div>
       </div>
-      <div class="hero-visual">
+      <div
+        class="hero-visual"
+        data-aos="fade-left"
+        data-aos-duration="550"
+        data-aos-delay="100"
+      >
         <!-- Hexágono externo — gira rápido -->
         <div class="orbit-ring ring-1">
           <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
@@ -115,7 +124,11 @@
     <div id="main-content" style="display: none">
       <!-- ── PORTFÓLIO: imagens filtráveis + cards ── -->
       <section class="section-label">
-        <div class="section-label-inner">
+        <div
+          class="section-label-inner"
+          data-aos="fade-up"
+          data-aos-duration="550"
+        >
           <span class="pill">Portfólio de Iniciativas</span>
           <h2>Projetos por Área</h2>
           <p>Clique em uma área para filtrar os projetos abaixo.</p>
@@ -124,14 +137,30 @@
 
       <div class="portfolio-wrapper">
         <!-- Botões de área (imagens) -->
-        <div class="area-filters" id="area-filters"></div>
+        <div
+          class="area-filters"
+          id="area-filters"
+          data-aos="zoom-in"
+          data-aos-duration="550"
+          data-aos-delay="60"
+        ></div>
         <!-- Cards filtráveis -->
-        <div class="cards-portfolio" id="cards-portfolio"></div>
+        <div
+          class="cards-portfolio"
+          id="cards-portfolio"
+          data-aos="fade-up"
+          data-aos-duration="550"
+          data-aos-delay="100"
+        ></div>
       </div>
 
       <!-- ── DASHBOARD ── -->
       <section class="section-label" style="margin-top: 0">
-        <div class="section-label-inner">
+        <div
+          class="section-label-inner"
+          data-aos="fade-up"
+          data-aos-duration="550"
+        >
           <span class="pill">Métricas</span>
           <h2>Dashboard de Impacto</h2>
           <p>
@@ -142,7 +171,13 @@
       </section>
 
       <main class="dashboard-container dashboard-multi">
-        <div class="kpi-row" id="kpi-row"></div>
+        <div
+          class="kpi-row"
+          id="kpi-row"
+          data-aos="zoom-in"
+          data-aos-duration="550"
+          data-aos-delay="60"
+        ></div>
 
         <div class="dash-row">
           <div class="chart-box dark-chart">
@@ -150,7 +185,12 @@
               <span class="chart-title">Evolução de Projetos por Ano</span
               ><span class="chart-badge">Linha</span>
             </div>
-            <div class="chart-canvas-wrap" style="height: 260px">
+            <div
+              class="chart-canvas-wrap"
+              style="height: 260px"
+              data-aos="fade-right"
+              data-aos-duration="550"
+            >
               <canvas id="graficoLinha"></canvas>
             </div>
           </div>
@@ -159,7 +199,13 @@
               <span class="chart-title">Projetos por ODS</span
               ><span class="chart-badge">Barras</span>
             </div>
-            <div class="chart-canvas-wrap" style="height: 260px">
+            <div
+              class="chart-canvas-wrap"
+              style="height: 260px"
+              data-aos="fade-left"
+              data-aos-duration="550"
+              data-aos-delay="100"
+            >
               <canvas id="graficoODS"></canvas>
             </div>
             <div class="chart-footer">
@@ -179,7 +225,12 @@
               <span class="chart-title">Distribuição por Categoria</span
               ><span class="chart-badge">Pizza</span>
             </div>
-            <div class="chart-canvas-wrap" style="height: 320px">
+            <div
+              class="chart-canvas-wrap"
+              style="height: 320px"
+              data-aos="flip-right"
+              data-aos-duration="550"
+            >
               <canvas id="graficoPizza"></canvas>
             </div>
             <div class="chart-footer">
@@ -196,7 +247,13 @@
               <span class="chart-title">Projetos por Área de Atuação</span
               ><span class="chart-badge">Radar</span>
             </div>
-            <div class="chart-canvas-wrap" style="height: 320px">
+            <div
+              class="chart-canvas-wrap"
+              style="height: 320px"
+              data-aos="flip-left"
+              data-aos-duration="550"
+              data-aos-delay="100"
+            >
               <canvas id="graficoRadar"></canvas>
             </div>
           </div>
@@ -208,7 +265,13 @@
               <span class="chart-title">Pontos de Impacto por Projeto</span
               ><span class="chart-badge">Barras</span>
             </div>
-            <div class="chart-canvas-wrap" style="height: 280px">
+            <div
+              class="chart-canvas-wrap"
+              style="height: 280px"
+              data-aos="fade-up"
+              data-aos-duration="550"
+              data-aos-delay="60"
+            >
               <canvas id="graficoImpacto"></canvas>
             </div>
             <div class="chart-footer">
@@ -226,14 +289,14 @@
 
     <footer class="site-footer">
       <div class="footer-inner">
-        <div class="footer-brand">
+        <div class="footer-brand" data-aos="fade-up" data-aos-duration="550">
           <span class="logo-mark">⬡</span> ENIAC ESG HUB
         </div>
         <p class="footer-desc">
           Comprometidos com um futuro mais justo e conectado.
         </p>
         <div class="footer-links">
-          <a href="index.html">Dashboard</a>
+          <a href="index.html">Projetos &amp; Dashboard</a>
           <a href="./html/quem-somos.html">Quem Somos</a>
           <a href="./html/impactos.html">Impactos e Valores</a>
         </div>
@@ -247,6 +310,16 @@
       </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 550,
+        easing: "ease-out-cubic",
+        once: true,
+        offset: 50,
+        delay: 0,
+      });
+    </script>
     <script src="./js/script.js"></script>
   </body>
 </html>
