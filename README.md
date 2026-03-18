@@ -93,6 +93,10 @@ Execute a API em modo de desenvolvimento:
 ```bash
 npm run start:dev
 ```
+ou
+```bash
+npm run start
+```
 
 A API estará disponível em http://localhost:3000 (ou outra porta configurada no projeto).
 
