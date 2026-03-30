@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import projetos from '../data/projetos.json';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AppService {
-  getDados(): object {
-    const jsonString = projetos;
+  constructor(private prisma: PrismaService) {}
 
-    return jsonString;
+  async getDados(){
+    return this.prisma.desafios.findMany();
   }
 }

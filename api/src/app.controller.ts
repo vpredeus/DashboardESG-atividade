@@ -5,7 +5,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiTags('Indicadores')
 @Controller('indicadores')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private appService: AppService) {}
 
   @ApiOperation({ summary: 'Lista os indicadores' })
   @Get()
