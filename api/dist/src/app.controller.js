@@ -28,6 +28,10 @@ let AppController = class AppController {
         const result = await this.appService.salvarDados(dados);
         return { message: "Dados salvos com sucesso.", count: result.count };
     }
+    async apagarDados() {
+        const result = await this.appService.apagarTodosDados();
+        return { message: "Dados removidos com sucesso.", count: result.count };
+    }
 };
 exports.AppController = AppController;
 __decorate([
@@ -49,6 +53,14 @@ __decorate([
     __metadata("design:paramtypes", [Array]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "salvarDados", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: "Remove todos os desafios salvos no banco" }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Dados removidos com sucesso." }),
+    (0, common_1.Delete)("dados"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "apagarDados", null);
 exports.AppController = AppController = __decorate([
     (0, swagger_1.ApiTags)("Indicadores"),
     (0, common_1.Controller)(),

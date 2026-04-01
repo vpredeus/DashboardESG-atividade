@@ -7,4 +7,8 @@ export declare class AppController {
         message: string;
         count: number;
     }>;
+    apagarDados(): Promise<{
+        message: string;
+        count: number;
+    }>;
 }

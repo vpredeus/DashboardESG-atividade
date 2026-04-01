@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   HttpCode,
   HttpStatus,
@@ -31,5 +32,13 @@ export class AppController {
   ): Promise<{ message: string; count: number }> {
     const result = await this.appService.salvarDados(dados);
     return { message: "Dados salvos com sucesso.", count: result.count };
+  }
+
+  @ApiOperation({ summary: "Remove todos os desafios salvos no banco" })
+  @ApiResponse({ status: 200, description: "Dados removidos com sucesso." })
+  @Delete("dados")
+  async apagarDados(): Promise<{ message: string; count: number }> {
+    const result = await this.appService.apagarTodosDados();
+    return { message: "Dados removidos com sucesso.", count: result.count };
   }
 }
