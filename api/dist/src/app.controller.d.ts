@@ -3,4 +3,5 @@ export declare class AppController {
     private appService;
     constructor(appService: AppService);
     getDados(): object;
+    criarDesafios(dados: any): Promise<object>;
 }

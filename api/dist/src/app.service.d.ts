@@ -23,4 +23,12 @@ export declare class AppService {
         eixo: string | null;
         natureza: string | null;
     }[]>;
+    criarDesafios(desafios: any[]): Promise<{
+        salvos: number;
+        ignorados: number;
+        detalhes: {
+            salvos: any[];
+            ignorados: any[];
+        };
+    }>;
 }

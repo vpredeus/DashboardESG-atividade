@@ -20,6 +20,39 @@ let AppService = class AppService {
     async getDados() {
         return this.prisma.desafios.findMany();
     }
+    async criarDesafios(desafios) {
+        const salvos = [];
+        const ignorados = [];
+        for (const desafio of desafios) {
+            if (desafio.postado) {
+                const existe = await this.prisma.desafios.findUnique({
+                    where: { postado: new Date(desafio.postado) },
+                }).catch(() => null);
+                if (existe) {
+                    ignorados.push({
+                        desafio,
+                        motivo: 'Desafio com este postado já existe',
+                    });
+                    continue;
+                }
+            }
+            const desafioCreated = await this.prisma.desafios.create({
+                data: {
+                    ...desafio,
+                    postado: desafio.postado ? new Date(desafio.postado) : null,
+                },
+            });
+            salvos.push(desafioCreated);
+        }
+        return {
+            salvos: salvos.length,
+            ignorados: ignorados.length,
+            detalhes: {
+                salvos,
+                ignorados,
+            },
+        };
+    }
 };
 exports.AppService = AppService;
 exports.AppService = AppService = __decorate([
