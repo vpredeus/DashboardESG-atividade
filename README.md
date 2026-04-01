@@ -64,8 +64,6 @@ Isso permitirá identificar **quais projetos geraram maior impacto social ou amb
 - HTML
 - CSS
 
-- *Python
-
 ---
 
 ## 🚀 Funcionalidades
@@ -75,6 +73,43 @@ Isso permitirá identificar **quais projetos geraram maior impacto social ou amb
 - Consumo da API por uma aplicação web
 - Visualização de dados em **gráfico de impacto ESG**
 - Comparação entre projetos sociais
+
+---
+
+## ⚙️ Como Rodar o Projeto
+
+Para executar o projeto, é necessário abrir **dois terminais**: um para a API e outro para o Frontend.
+
+### 1️⃣ Rodando a API (NestJS)
+
+No terminal, acesse a pasta da API:
+Instale a dependência
+
+```bash
+npm install
+```
+Execute a API em modo de desenvolvimento:
+
+```bash
+npm run start:dev
+```
+ou
+```bash
+npm run start
+```
+
+A API estará disponível em http://localhost:3000 (ou outra porta configurada no projeto).
+
+### 2️⃣ Rodando o Frontend
+
+No outro terminal, acesse a pasta do frontend:
+
+Inicie o servidor local com o serve:
+
+```bash
+npx serve .
+```
+Após isso, abra o navegador e acesse o endereço mostrado pelo terminal para visualizar o dashboard.
 
 ---
 
@@ -91,22 +126,22 @@ Cada projeto aparecerá como um elemento no gráfico, permitindo observar facilm
 Projeto desenvolvido por:
 
 Frontend
-- Ana Paula
-- Enzo Dutra
-- Rafael Brito
-- Arthur Augusto
+- Ana Paula (@Itsanapaula) 
+- Enzo Dutra (@Enzo-Dutra)
+- Rafael Brito (@Rafa-A-Brito)
+- Arthur Augusto (@ArthurBigodeAug)
 
 API:
-- Fernando
-- Nicolas
-- Henrique
+- Fernando (@F3rCar)
+- Nicolas (@Fladenz)
+- Henrique (@Gimenes77)
 
 Github: 
-- Eduardo Vilaronga
-- João Victor Predeus
+- Eduardo Vilaronga (@vilarongadiaseduardo-glitch)
+- João Victor Predeus (@vpredeus)
 
 Admin: 
-- Luiz Gustavo
+- Luiz Gustavo (@luiz030609)
 
 ---
 
