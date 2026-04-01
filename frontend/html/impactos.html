@@ -11,12 +11,200 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
     <link rel="icon" href="../images/esg_logo.png" type="image/png" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      /* ── Paginação ── */
+      #paginacao-top,
+      #paginacao-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 20px 24px;
+        flex-wrap: wrap;
+      }
+      .pag-info {
+        font-size: 0.8rem;
+        color: var(--texto-muted);
+        flex-basis: 100%;
+        text-align: center;
+        margin-bottom: 4px;
+      }
+      .pag-btn {
+        min-width: 40px;
+        height: 38px;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(31, 43, 108, 0.4);
+        background: #fff;
+        color: var(--eniac-azul);
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding: 0 14px;
+        transition: all 0.18s;
+        font-family: "Sora", sans-serif;
+      }
+      .pag-btn:hover {
+        background: var(--eniac-azul);
+        color: #fff;
+      }
+      .pag-btn.active {
+        background: var(--eniac-azul);
+        color: var(--eniac-amarelo);
+        border-color: var(--eniac-azul);
+      }
+      .pag-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+      .pag-sep {
+        color: var(--texto-muted);
+        font-weight: 700;
+        padding: 0 4px;
+      }
+
+      /* ── Estados loading/erro ── */
+      .loading-state,
+      .error-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 80px 24px;
+        text-align: center;
+        color: var(--texto-muted);
+      }
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(31, 43, 108, 0.15);
+        border-top-color: var(--eniac-azul);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .error-icon {
+        font-size: 2rem;
+      }
+      .error-state button {
+        padding: 10px 24px;
+        border-radius: 8px;
+        background: var(--eniac-azul);
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 700;
+        font-family: "Sora", sans-serif;
+        transition: opacity 0.2s;
+      }
+      .error-state button:hover {
+        opacity: 0.85;
+      }
+      .error-state a {
+        color: var(--eniac-azul);
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-top: -4px;
+      }
+
+      /* ── Impacto section — card-specific additions ── */
+      .impacto-empresa {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--eniac-amarelo);
+        margin-bottom: 4px;
+      }
+      .impacto-responsavel {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.45);
+        margin-top: 4px;
+      }
+      .impacto-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-end;
+        flex-shrink: 0;
+      }
+      .impacto-nat-badge {
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .impacto-num-row {
+        display: flex;
+        gap: 28px;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        flex-wrap: wrap;
+      }
+      .impacto-num-item {
+        display: flex;
+        flex-direction: column;
+      }
+      .impacto-minichart {
+        margin-top: 12px;
+      }
+      .impacto-areas {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .area-chip {
+        padding: 3px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(52, 152, 219, 0.2);
+        color: rgba(52, 152, 219, 0.9);
+      }
+      .impacto-desc-extra {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.82rem;
+      }
+
+      /* Seção dos gráficos globais — fundo claro, textos escuros */
+      #imp-content > .section-label .section-label-inner h2,
+      #imp-content > .section-label .section-label-inner p {
+        color: inherit;
+      }
+      .info-text ul {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        color: var(--texto-muted);
+        font-size: 0.92rem;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -44,32 +232,39 @@
       </div>
     </section>
 
-    <!-- Loading / Erro próprios desta página -->
+    <!-- Loading / Erro -->
     <div id="imp-loading" class="loading-state">
       <div class="loading-spinner"></div>
-      <p>Carregando dados da API...</p>
+      <p>Carregando dados...</p>
     </div>
     <div id="imp-error" class="error-state" style="display: none">
       <span class="error-icon">⚠️</span>
-      <p id="imp-error-msg">Não foi possível conectar à API.</p>
-      <button onclick="carregarImpactos()">Tentar novamente</button>
+      <p id="imp-error-msg">Não foi possível encontrar os dados.</p>
+      <a href="../index.html"
+        >← Ir para a página principal e fazer upload do CSV</a
+      >
     </div>
 
-    <!-- Conteúdo — oculto até API responder -->
+    <!-- Conteúdo — oculto até sessionStorage ser lido -->
     <div id="imp-content" style="display: none">
-      <!-- Projetos com textos de pesquisa -->
+      <!-- Análise por projeto -->
       <section class="section-label">
         <div class="section-label-inner">
           <span class="pill" data-aos="fade-up" data-aos-duration="550"
             >Análise por Projeto</span
           >
           <h2>Cada Iniciativa em Detalhe</h2>
-          <p>
-            Textos de pesquisa, impactos mensurados e referências bibliográficas
-            de cada projeto do portfólio ESG.
+          <p id="sec-projetos-subtitulo">
+            Síntese de cada projeto, impactos diretos e indiretos mensurados do
+            portfólio ESG.
           </p>
         </div>
       </section>
+
+      <!-- Paginação (topo) -->
+      <div id="paginacao-top"></div>
+
+      <!-- Grid de templates por projeto -->
       <main
         class="impactos-main"
         id="impactos-lista"
@@ -78,7 +273,10 @@
         data-aos-delay="60"
       ></main>
 
-      <!-- Gráficos -->
+      <!-- Paginação (baixo) -->
+      <div id="paginacao-bottom"></div>
+
+      <!-- Gráficos globais -->
       <section class="section-label" style="padding-top: 20px">
         <div class="section-label-inner">
           <span class="pill" data-aos="fade-up" data-aos-duration="550"
@@ -86,8 +284,9 @@
           >
           <h2>Distribuição de Impacto ESG</h2>
           <p>
-            Visualização consolidada dos dados de impacto por categoria e por
-            projeto.
+            Visualização consolidada dos indicadores de impacto sociais,
+            segmentados por empresa e responsável, com análise por eixo,
+            natureza das iniciativas e alinhamento aos ODS.
           </p>
         </div>
       </section>
@@ -95,15 +294,17 @@
       <div class="dashboard-container">
         <div class="grid-layout">
           <div class="info-text" data-aos="fade-right" data-aos-duration="550">
-            <h2>
-              Nossos Valores <br /><span class="text-accent">Mensurados</span>
-            </h2>
+            <h2>Valores <span class="text-accent">Mensurados</span></h2>
             <p>
-              Cada projeto é avaliado pelo seu
-              <strong>Impacto de Valor</strong>, garantindo que as ações sociais
-              e ambientais transformem a realidade local de forma concreta e
-              verificável.
+              Os projetos são avaliados a partir de indicadores estruturados:
             </p>
+            <ul>
+              <li>📊 Impacto social direto</li>
+              <li>🌐 Impacto social indireto</li>
+              <li>🎯 Alinhamento com os ODS</li>
+              <li>🧭 Eixo de atuação do projeto</li>
+              <li>🏷️ Natureza da iniciativa</li>
+            </ul>
             <div
               class="legend-box"
               id="legend-categorias"
@@ -112,7 +313,7 @@
           </div>
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Impacto por Categoria</span>
+              <span class="chart-title">Impacto por Eixo</span>
               <span class="chart-badge">Pizza</span>
             </div>
             <div
@@ -126,7 +327,7 @@
             <div class="chart-footer">
               <button
                 class="export-btn"
-                onclick="exportCSV('categoriaChart', 'impacto_categorias')"
+                onclick="exportCSV('categoriaChart', 'impacto_eixos')"
               >
                 ⬇ Exportar CSV
               </button>
@@ -139,7 +340,7 @@
         <div class="grid-layout">
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Impacto Individual por Projeto</span>
+              <span class="chart-title">Impacto Social Direto por Projeto</span>
               <span class="chart-badge">Barras</span>
             </div>
             <div
@@ -167,37 +368,17 @@
             <h2>
               Alcance Social <br /><span class="text-accent">e Ambiental</span>
             </h2>
-            <p>
-              O gráfico demonstra os pontos de impacto de cada iniciativa
-              individualmente, permitindo comparar o alcance de cada projeto
-              dentro do portfólio ESG.
-            </p>
+            <p>Comparativo de impacto social direto e indireto por projeto:</p>
+            <ul>
+              <li>👥 Pessoas impactadas diretamente</li>
+              <li>🌍 Pessoas impactadas indiretamente</li>
+              <li>📌 Distribuição por projeto</li>
+              <li>🎯 Relação com os ODS</li>
+              <li>📈 Comparativo entre iniciativas</li>
+            </ul>
             <a href="../index.html" class="cta-btn">← Ver Dashboard</a>
           </div>
         </div>
-      </div>
-
-      <!-- Bibliografia -->
-      <section class="section-label" style="padding-top: 20px">
-        <div class="section-label-inner">
-          <span class="pill" data-aos="fade-up" data-aos-duration="550"
-            >Fontes</span
-          >
-          <h2>Referências Bibliográficas</h2>
-          <p>
-            Todas as informações apresentadas foram embasadas em pesquisas de
-            fontes confiáveis.
-          </p>
-        </div>
-      </section>
-      <!-- Ticker de referências bibliográficas -->
-      <div
-        class="bib-ticker-wrap"
-        data-aos="fade-up"
-        data-aos-duration="550"
-        data-aos-delay="60"
-      >
-        <div class="bib-ticker" id="bibliografia-lista"></div>
       </div>
     </div>
     <!-- fim #imp-content -->
