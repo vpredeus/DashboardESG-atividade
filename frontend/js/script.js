@@ -647,19 +647,6 @@ function fecharPainelUpload() {
 async function _iniciarApp() {
   const dados = await _carregarDados();
   if (dados && dados.length) {
-<<<<<<< HEAD
-    // Já há dados: mostra dashboard diretamente
-    const mc = document.getElementById("main-content");
-    if (mc) mc.style.display = "block";
-    renderIndex(dados);
-    // Garante que o modal NÃO aparece automaticamente
-    const overlay = document.getElementById("uploadModalOverlay");
-    if (overlay) overlay.classList.remove("show");
-  } else {
-    // Sem dados: abre modal de upload
-    mostrarPainelUpload();
-  }
-=======
     // Já há dados: renderiza dashboard em background, mostra botão fechar no modal
     const mc = document.getElementById("main-content");
     if (mc) mc.style.display = "block";
@@ -669,7 +656,6 @@ async function _iniciarApp() {
     if (closeBtn) closeBtn.style.display = "flex";
   }
   // Se não há dados: modal já aberto sem botão fechar — comportamento correto
->>>>>>> feature/banco-de-dados
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -719,30 +705,7 @@ function processarCSV() {
   reader.readAsText(_csvFile, "UTF-8");
 }
 
-<<<<<<< HEAD
 function enviarParaServidor(dados) {
-  // Em produção, troque pela URL do seu backend ou use variável de ambiente
-=======
-// ── Toast de notificação ─────────────────────────────────────────
-function _showToast(msg, type, iconClass) {
-  const old = document.getElementById("esg-toast");
-  if (old) old.remove();
-  const toast = document.createElement("div");
-  toast.id = "esg-toast";
-  toast.className = "esg-toast esg-toast--" + type;
-  toast.innerHTML = '<i class="' + iconClass + '"></i><span>' + msg + "</span>";
-  document.body.appendChild(toast);
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => toast.classList.add("show"));
-  });
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 400);
-  }, 4500);
-}
-
-function enviarParaServidor(dados) {
->>>>>>> feature/banco-de-dados
   const API_BASE = window.ESG_API_URL || "http://localhost:3000";
   fetch(`${API_BASE}/dados`, {
     method: "POST",
@@ -753,12 +716,6 @@ function enviarParaServidor(dados) {
       if (!res.ok) throw new Error("Erro na resposta do servidor");
       return res.json();
     })
-<<<<<<< HEAD
-    .then((data) => console.info("Sincronização com banco concluída.", data))
-    .catch((err) =>
-      console.warn("Erro ao sincronizar com banco (non-blocking):", err),
-    );
-=======
     .then(() => {
       _showToast(
         "Dados sincronizados com o banco de dados com sucesso.",
@@ -773,7 +730,6 @@ function enviarParaServidor(dados) {
         "fa-solid fa-database",
       );
     });
->>>>>>> feature/banco-de-dados
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1039,20 +995,6 @@ function _buildImpactoCardGrid(p, idx) {
     String(Math.min((idx % ITENS_POR_PAGINA) * 50, 250)),
   );
   div.style.cssText = `
-<<<<<<< HEAD
-    background:rgba(20,28,74,0.82); border:1px solid rgba(255,255,255,0.07);
-    border-top:3px solid ${cor}; border-radius:14px;
-    padding:22px 20px 18px; display:flex; flex-direction:column; gap:12px;
-    transition:transform .2s, box-shadow .2s; cursor:default;
-  `;
-  div.onmouseenter = () => {
-    div.style.transform = "translateY(-4px)";
-    div.style.boxShadow = `0 8px 28px rgba(0,0,0,0.35)`;
-  };
-  div.onmouseleave = () => {
-    div.style.transform = "";
-    div.style.boxShadow = "";
-=======
     background: linear-gradient(145deg, rgba(20,28,80,0.92) 0%, rgba(15,21,60,0.97) 100%);
     border:1px solid ${cor}33;
     border-top:3px solid ${cor};
@@ -1078,7 +1020,6 @@ function _buildImpactoCardGrid(p, idx) {
     div.style.boxShadow =
       "0 4px 18px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04)";
     glow.style.opacity = "0.07";
->>>>>>> feature/banco-de-dados
   };
 
   div.innerHTML = `
@@ -1148,10 +1089,6 @@ function _renderPaginacao() {
   ["paginacao-top", "paginacao-bottom"].forEach((cid) => {
     const el = document.getElementById(cid);
     if (!el) return;
-<<<<<<< HEAD
-    if (total <= 1) {
-      el.innerHTML = "";
-=======
     if (total <= 1 || _modoVerTodos) {
       // Sem paginação: mostra mini chip ⓘ colapsado em vez da box
       el.innerHTML = `
@@ -1159,7 +1096,6 @@ function _renderPaginacao() {
           <i class="fa-solid fa-circle-info"></i>
           <span>${_todosProj.length} projeto${_todosProj.length !== 1 ? "s" : ""} · todos exibidos</span>
         </div>`;
->>>>>>> feature/banco-de-dados
       return;
     }
     const range = _buildPageRange(_paginaAtual, total);

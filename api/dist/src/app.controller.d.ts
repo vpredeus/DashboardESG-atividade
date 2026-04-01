@@ -1,6 +1,10 @@
-import { AppService } from './app.service';
+import { AppService } from "./app.service";
 export declare class AppController {
-    private readonly appService;
+    private appService;
     constructor(appService: AppService);
-    getDados(): object;
+    getDados(): Promise<object[]>;
+    salvarDados(dados: object[]): Promise<{
+        message: string;
+        count: number;
+    }>;
 }

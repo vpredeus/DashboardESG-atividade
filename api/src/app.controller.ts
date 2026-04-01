@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-
-@ApiTags('Indicadores')
-@Controller('indicadores')
-export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @ApiOperation({ summary: 'Lista os indicadores' })
-  @Get()
-  getDados(): object {
-    return this.appService.getDados();
-=======
 import {
   Controller,
   Get,
@@ -46,6 +31,5 @@ export class AppController {
   ): Promise<{ message: string; count: number }> {
     const result = await this.appService.salvarDados(dados);
     return { message: "Dados salvos com sucesso.", count: result.count };
->>>>>>> feature/banco-de-dados
   }
 }
