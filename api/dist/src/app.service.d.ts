@@ -62,5 +62,8 @@ export declare class AppService {
     private encontrarLinhaIdentica;
     private compararCampos;
     private parsePostado;
+    apagarTodosDados(): Promise<{
+        count: number;
+    }>;
 }
 export {};

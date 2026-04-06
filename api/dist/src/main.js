@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
+require("dotenv/config");
 const swagger_1 = require("@nestjs/swagger");
 const bodyParser = __importStar(require("body-parser"));
 async function bootstrap() {

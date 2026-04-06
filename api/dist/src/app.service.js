@@ -12,6 +12,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+function parsePostado(value) {
+    if (typeof value !== "string")
+        return null;
+    const raw = value.trim();
+    if (!raw)
+        return null;
+    const br = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})$/);
+    if (br) {
+        const iso = `${br[3]}-${br[2]}-${br[1]}T${br[4]}:${br[5]}:${br[6]}`;
+        const parsed = new Date(iso);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+    const parsed = new Date(raw.replace(" ", "T"));
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+function normText(value) {
+    return (value ?? "").trim().toLowerCase();
+}
+function desafioKey(item) {
+    return [
+        normText(item.empresa),
+        normText(item.titulo_desafio),
+        normText(item.descricao_desafio),
+        item.postado ? item.postado.toISOString() : "",
+    ].join("|");
+}
 let AppService = class AppService {
     prisma;
     constructor(prisma) {
@@ -136,6 +162,17 @@ let AppService = class AppService {
             return null;
         const parsedDate = postado instanceof Date ? postado : new Date(postado);
         return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+    }
+    async apagarTodosDados() {
+        try {
+            const result = await this.prisma.desafios.deleteMany();
+            this.logger.log(`🗑️ ${result.count} registros removidos do banco.`);
+            return { count: result.count };
+        }
+        catch (error) {
+            this.logger.error("Erro ao apagar dados do banco:", error);
+            throw new InternalServerErrorException("Falha ao apagar os dados do banco.");
+        }
     }
 };
 exports.AppService = AppService;

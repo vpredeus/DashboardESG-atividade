@@ -1,4 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma, desafios as Desafio } from "@prisma/client";
 
@@ -11,8 +15,66 @@ type DesafioIgnorado = {
   motivo: string;
 };
 
+type ProjetoInput = {
+  postado?: string | null;
+  tipo?: string | null;
+  empresa?: string | null;
+  responsavel?: string | null;
+  email?: string | null;
+  titulo?: string | null;
+  descricaoDesafio?: string | null;
+  descricao?: string | null;
+  areaPrimaria?: string | null;
+  areaSecundaria?: string | null;
+  resumo?: string | null;
+  ods1?: string | number | null;
+  ods2?: string | number | null;
+  ods3?: string | number | null;
+  impactoSocialDireto?: number | null;
+  impactoSocialIndireto?: number | null;
+  eixo?: string | null;
+  natureza?: string | null;
+};
+
+function parsePostado(value: unknown): Date | null {
+  if (typeof value !== "string") return null;
+
+  const raw = value.trim();
+  if (!raw) return null;
+
+  const br = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})$/);
+
+  if (br) {
+    const iso = `${br[3]}-${br[2]}-${br[1]}T${br[4]}:${br[5]}:${br[6]}`;
+    const parsed = new Date(iso);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  const parsed = new Date(raw.replace(" ", "T"));
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function normText(value: string | null): string {
+  return (value ?? "").trim().toLowerCase();
+}
+
+function desafioKey(item: {
+  empresa: string | null;
+  titulo_desafio: string | null;
+  descricao_desafio: string | null;
+  postado: Date | null;
+}): string {
+  return [
+    normText(item.empresa),
+    normText(item.titulo_desafio),
+    normText(item.descricao_desafio),
+    item.postado ? item.postado.toISOString() : "",
+  ].join("|");
+}
+
 @Injectable()
 export class AppService {
+  private readonly logger = new Logger(AppService.name);
   constructor(private prisma: PrismaService) {}
 
   async getDados() {
@@ -189,5 +251,18 @@ export class AppService {
     if (!postado) return null;
     const parsedDate = postado instanceof Date ? postado : new Date(postado);
     return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+  }
+
+  async apagarTodosDados(): Promise<{ count: number }> {
+    try {
+      const result = await this.prisma.desafios.deleteMany();
+      Logger.log(`🗑️ ${result.count} registros removidos do banco.`);
+      return { count: result.count };
+    } catch (error) {
+      Logger.error("Erro ao apagar dados do banco:", error);
+      throw new InternalServerErrorException(
+        "Falha ao apagar os dados do banco.",
+      );
+    }
   }
 }

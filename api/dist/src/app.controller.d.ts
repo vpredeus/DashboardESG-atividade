@@ -7,4 +7,8 @@ export declare class AppController {
     criarDesafios(dados: DesafioInput[] | {
         desafios: DesafioInput[];
     }): Promise<object>;
+    apagarDados(): Promise<{
+        message: string;
+        count: number;
+    }>;
 }

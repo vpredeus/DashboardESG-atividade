@@ -1,0 +1,19 @@
+{
+  "indicadores": [
+    { "projeto": "Horta Comunitária", "categoria": "Ambiental", "impacto": 120, "ods": "ODS 2", "area": "Educação", "data": "2022-03-10" },
+    { "projeto": "Capacitação Profissional", "categoria": "Social", "impacto": 80, "ods": "ODS 8", "area": "Gestão", "data": "2022-06-15" },
+    { "projeto": "Reciclagem Urbana", "categoria": "Ambiental", "impacto": 150, "ods": "ODS 12", "area": "Engenharia", "data": "2023-01-20" },
+    { "projeto": "Inclusão Digital", "categoria": "Social", "impacto": 60, "ods": "ODS 9", "area": "TI", "data": "2023-04-10" },
+    { "projeto": "Plantio de Árvores", "categoria": "Ambiental", "impacto": 200, "ods": "ODS 13", "area": "Engenharia", "data": "2023-08-22" },
+    { "projeto": "Educação Ambiental", "categoria": "Educacional", "impacto": 90, "ods": "ODS 4", "area": "Educação", "data": "2024-02-12" },
+    { "projeto": "Oficina de Programação", "categoria": "Educacional", "impacto": 70, "ods": "ODS 4", "area": "TI", "data": "2024-05-18" },
+    { "projeto": "Coleta Seletiva", "categoria": "Ambiental", "impacto": 130, "ods": "ODS 11", "area": "Engenharia", "data": "2024-09-30" },
+    { "projeto": "Empreendedorismo Local", "categoria": "Econômico", "impacto": 110, "ods": "ODS 8", "area": "Gestão", "data": "2025-01-10" },
+    { "projeto": "Alfabetização Adultos", "categoria": "Social", "impacto": 65, "ods": "ODS 4", "area": "Educação", "data": "2025-03-05" },
+    { "projeto": "Limpeza de Praias", "categoria": "Ambiental", "impacto": 140, "ods": "ODS 14", "area": "Engenharia", "data": "2025-06-20" },
+    { "projeto": "Distribuição de Alimentos", "categoria": "Social", "impacto": 170, "ods": "ODS 2", "area": "Saúde", "data": "2025-08-11" },
+    { "projeto": "Energia Solar", "categoria": "Ambiental", "impacto": 95, "ods": "ODS 7", "area": "Engenharia", "data": "2026-01-25" },
+    { "projeto": "Biblioteca Comunitária", "categoria": "Educacional", "impacto": 75, "ods": "ODS 4", "area": "Educação", "data": "2026-03-12" },
+    { "projeto": "Assessoria Jurídica", "categoria": "Social", "impacto": 85, "ods": "ODS 16", "area": "Direito", "data": "2026-05-18" }
+  ]
+}
