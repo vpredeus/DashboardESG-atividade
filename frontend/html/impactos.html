@@ -189,6 +189,48 @@
         font-size: 0.82rem;
       }
 
+      /* ── Tag de seção nos textos informativos ── */
+      .chart-info-tag {
+        display: inline-block;
+        background: rgba(255, 215, 0, 0.12);
+        color: var(--eniac-amarelo);
+        border: 1px solid rgba(255, 215, 0, 0.28);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        padding: 4px 14px;
+        border-radius: 50px;
+        margin-bottom: 14px;
+      }
+
+      /* ── Legenda inline para rosca/pizza extras ── */
+      .leg-inline {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .leg-inline-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--texto-muted);
+      }
+      .leg-inline-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .leg-inline-val {
+        margin-left: auto;
+        font-weight: 700;
+        color: var(--texto-escuro);
+        font-family: "Space Mono", monospace;
+        font-size: 0.8rem;
+      }
+
       /* Seção dos gráficos globais — fundo claro, textos escuros */
       #imp-content > .section-label .section-label-inner h2,
       #imp-content > .section-label .section-label-inner p {
@@ -292,19 +334,31 @@
       </section>
 
       <div class="dashboard-container">
-        <div class="grid-layout">
-          <div class="info-text" data-aos="fade-right" data-aos-duration="550">
-            <h2>Valores <span class="text-accent">Mensurados</span></h2>
+        <!-- ── Gráfico 1: Impacto total por eixo (Pizza) ── -->
+        <div class="grid-layout" data-aos="fade-up" data-aos-duration="550">
+          <div class="info-text">
+            <span class="chart-info-tag">Eixos ESG</span>
+            <h2>
+              Distribuição por <span class="text-accent">Eixo de Atuação</span>
+            </h2>
             <p>
-              Os projetos são avaliados a partir de indicadores estruturados:
+              Cada projeto é classificado dentro de um eixo temático ESG — meio
+              ambiente, governança, desenvolvimento social, entre outros. Este
+              gráfico mostra a proporção do
+              <strong>impacto total acumulado</strong>
+              (direto + indireto) de todos os projetos, agrupado por eixo.
             </p>
-            <ul>
-              <li>📊 Impacto social direto</li>
-              <li>🌐 Impacto social indireto</li>
-              <li>🎯 Alinhamento com os ODS</li>
-              <li>🧭 Eixo de atuação do projeto</li>
-              <li>🏷️ Natureza da iniciativa</li>
-            </ul>
+            <p
+              style="
+                margin-top: 10px;
+                color: var(--texto-muted);
+                font-size: 0.88rem;
+              "
+            >
+              Um eixo com maior fatia indica que mais pessoas foram alcançadas
+              por iniciativas daquela categoria, permitindo identificar onde o
+              portfólio ESG está mais concentrado.
+            </p>
             <div
               class="legend-box"
               id="legend-categorias"
@@ -313,7 +367,7 @@
           </div>
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Impacto por Eixo</span>
+              <span class="chart-title">Impacto Total por Eixo</span>
               <span class="chart-badge">Pizza</span>
             </div>
             <div
@@ -337,10 +391,13 @@
 
         <div class="section-divider"></div>
 
-        <div class="grid-layout">
+        <!-- ── Gráfico 2: Direto vs Indireto por projeto (Barras agrupadas) ── -->
+        <div class="grid-layout" data-aos="fade-up" data-aos-duration="550">
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Impacto Social Direto por Projeto</span>
+              <span class="chart-title"
+                >Impacto Direto vs Indireto por Projeto</span
+              >
               <span class="chart-badge">Barras</span>
             </div>
             <div
@@ -353,7 +410,7 @@
             <div class="chart-footer">
               <button
                 class="export-btn"
-                onclick="exportCSV('impactosBar', 'impacto_projetos')"
+                onclick="exportCSV('impactosBar', 'impacto_direto_indireto')"
               >
                 ⬇ Exportar CSV
               </button>
@@ -365,18 +422,180 @@
             data-aos-duration="550"
             data-aos-delay="100"
           >
-            <h2>
-              Alcance Social <br /><span class="text-accent">e Ambiental</span>
-            </h2>
-            <p>Comparativo de impacto social direto e indireto por projeto:</p>
-            <ul>
-              <li>👥 Pessoas impactadas diretamente</li>
-              <li>🌍 Pessoas impactadas indiretamente</li>
-              <li>📌 Distribuição por projeto</li>
-              <li>🎯 Relação com os ODS</li>
-              <li>📈 Comparativo entre iniciativas</li>
-            </ul>
+            <span class="chart-info-tag">Alcance Social</span>
+            <h2>Direto <span class="text-accent">e Indireto</span></h2>
+            <p>
+              O <strong>impacto direto</strong> representa pessoas que
+              participam ativamente da iniciativa — colaboradores, estudantes,
+              beneficiários imediatos. O
+              <strong>impacto indireto</strong> alcança comunidades, famílias e
+              cadeias produtivas afetadas de forma secundária.
+            </p>
+            <p
+              style="
+                margin-top: 10px;
+                color: var(--texto-muted);
+                font-size: 0.88rem;
+              "
+            >
+              Projetos com alto impacto indireto tendem a ter efeito sistêmico,
+              influenciando políticas, culturas organizacionais ou ecossistemas
+              inteiros.
+            </p>
             <a href="../index.html" class="cta-btn">← Ver Dashboard</a>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ── Gráfico 3: Frequência de ODS (Barras horizontais) ── -->
+        <div class="grid-layout" data-aos="fade-up" data-aos-duration="550">
+          <div class="info-text">
+            <span class="chart-info-tag">Agenda 2030</span>
+            <h2>Alinhamento aos <span class="text-accent">ODS</span></h2>
+            <p>
+              Os Objetivos de Desenvolvimento Sustentável da ONU estruturam a
+              pauta global de sustentabilidade. Cada projeto pode se alinhar a
+              até 3 ODS simultaneamente.
+            </p>
+            <p
+              style="
+                margin-top: 10px;
+                color: var(--texto-muted);
+                font-size: 0.88rem;
+              "
+            >
+              O gráfico mostra quantos projetos do portfólio citam cada ODS,
+              revelando quais objetivos o programa ESG prioriza coletivamente.
+              ODS com mais citações indicam focos estratégicos do programa.
+            </p>
+            <div id="legend-ods" style="margin-top: 16px"></div>
+          </div>
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Projetos por ODS</span>
+              <span class="chart-badge">Barras Horizontais</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              data-aos="fade-left"
+              data-aos-duration="550"
+              data-aos-delay="60"
+            >
+              <canvas id="odsChart"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('odsChart', 'alinhamento_ods')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ── Gráfico 4: Natureza das iniciativas (Rosca) ── -->
+        <div class="grid-layout" data-aos="fade-up" data-aos-duration="550">
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Natureza das Iniciativas</span>
+              <span class="chart-badge">Rosca</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              data-aos="zoom-in"
+              data-aos-duration="550"
+            >
+              <canvas id="naturezaChart"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('naturezaChart', 'natureza_iniciativas')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
+          </div>
+          <div
+            class="info-text"
+            data-aos="fade-right"
+            data-aos-duration="550"
+            data-aos-delay="100"
+          >
+            <span class="chart-info-tag">Tipologia</span>
+            <h2>Origem das <span class="text-accent">Iniciativas</span></h2>
+            <p>
+              As iniciativas ESG do portfólio podem ter origem
+              <strong>privada</strong> (empresas),
+              <strong>pública</strong> (órgãos governamentais) ou
+              <strong>acadêmica</strong> (universidades e centros de pesquisa).
+            </p>
+            <p
+              style="
+                margin-top: 10px;
+                color: var(--texto-muted);
+                font-size: 0.88rem;
+              "
+            >
+              Entender a composição do portfólio por natureza ajuda a avaliar a
+              diversidade de atores e identificar lacunas de engajamento — por
+              exemplo, se o setor público está sub-representado.
+            </p>
+            <div id="legend-natureza" style="margin-top: 16px"></div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ── Gráfico 5: Área primária — Radar ── -->
+        <div class="grid-layout" data-aos="fade-up" data-aos-duration="550">
+          <div class="info-text">
+            <span class="chart-info-tag">Áreas Temáticas</span>
+            <h2>
+              Concentração por <span class="text-accent">Área Primária</span>
+            </h2>
+            <p>
+              Cada projeto declara uma área temática principal —
+              Sustentabilidade, Governança, Gestão, Infraestrutura, etc. O radar
+              mostra como os projetos se distribuem entre essas áreas.
+            </p>
+            <p
+              style="
+                margin-top: 10px;
+                color: var(--texto-muted);
+                font-size: 0.88rem;
+              "
+            >
+              Áreas com vértices maiores concentram mais projetos, sinalizando
+              competências consolidadas. Vértices menores indicam oportunidades
+              de expansão do portfólio ESG para cobrir lacunas temáticas.
+            </p>
+          </div>
+          <div class="chart-box dark-chart">
+            <div class="chart-header">
+              <span class="chart-title">Projetos por Área Primária</span>
+              <span class="chart-badge">Radar</span>
+            </div>
+            <div
+              class="chart-canvas-wrap"
+              data-aos="zoom-in"
+              data-aos-duration="550"
+              data-aos-delay="60"
+            >
+              <canvas id="areaChart"></canvas>
+            </div>
+            <div class="chart-footer">
+              <button
+                class="export-btn"
+                onclick="exportCSV('areaChart', 'areas_primarias')"
+              >
+                ⬇ Exportar CSV
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -418,4 +637,28 @@
     </script>
     <script src="../js/script.js"></script>
   </body>
+  <div id="custom-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-card">
+      <div class="custom-alert-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3>Aviso de Performance</h3>
+      <p id="custom-alert-message">
+        Carregar muitos projetos de uma vez pode deixar a navegação lenta.
+        Deseja continuar?
+      </p>
+      <div class="custom-alert-actions">
+        <button id="alert-cancel" class="alert-btn secondary">Cancelar</button>
+        <button id="alert-confirm" class="alert-btn primary">
+          Sim, carregar todos
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Processando dados ESG...</p>
+    </div>
+  </div>
 </html>

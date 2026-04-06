@@ -1,35 +1,25 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-} from "@nestjs/common";
+import { Controller, Get, Post, Body } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { ApiOperation, ApiTags, ApiBody, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { DesafioInput } from "./app.service";
 
 @ApiTags("Indicadores")
-@Controller()
+@Controller("indicadores")
 export class AppController {
   constructor(private appService: AppService) {}
 
-  @ApiOperation({ summary: "Lista todos os indicadores salvos no banco" })
-  @ApiResponse({ status: 200, description: "Retorna array de desafios." })
-  @Get("indicadores")
-  async getDados(): Promise<object[]> {
-    return await this.appService.getDados();
+  @ApiOperation({ summary: "Lista os indicadores" })
+  @Get()
+  getDados(): object {
+    return this.appService.getDados();
   }
 
-  @ApiOperation({ summary: "Recebe e salva os dados do CSV no banco" })
-  @ApiBody({ description: "Array de objetos de projeto ESG", type: [Object] })
-  @ApiResponse({ status: 200, description: "Dados salvos com sucesso." })
-  @HttpCode(HttpStatus.OK)
-  @Post("dados")
-  async salvarDados(
-    @Body() dados: object[],
-  ): Promise<{ message: string; count: number }> {
-    const result = await this.appService.salvarDados(dados);
-    return { message: "Dados salvos com sucesso.", count: result.count };
+  @ApiOperation({ summary: "Criar múltiplos desafios e ignorar duplicatas" })
+  @Post()
+  criarDesafios(
+    @Body() dados: DesafioInput[] | { desafios: DesafioInput[] },
+  ): Promise<object> {
+    const desafios = Array.isArray(dados) ? dados : dados.desafios;
+    return this.appService.criarDesafios(desafios);
   }
 }

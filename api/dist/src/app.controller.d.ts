@@ -1,10 +1,10 @@
 import { AppService } from "./app.service";
+import { DesafioInput } from "./app.service";
 export declare class AppController {
     private appService;
     constructor(appService: AppService);
-    getDados(): Promise<object[]>;
-    salvarDados(dados: object[]): Promise<{
-        message: string;
-        count: number;
-    }>;
+    getDados(): object;
+    criarDesafios(dados: DesafioInput[] | {
+        desafios: DesafioInput[];
+    }): Promise<object>;
 }
