@@ -507,17 +507,28 @@ function parseCSVText(text) {
 // ══════════════════════════════════════════════════════════════════
 //  DEDUPLICAÇÃO FRONT-END
 //  Remove linhas completamente idênticas em todos os campos antes
-//  de enviar ao servidor. Compara o valor normalizado de cada campo.
+//  de enviar ao servidor. Compara os mesmos campos snake_case que
+//  o back-end usa, garantindo consistência entre as duas camadas.
 // ══════════════════════════════════════════════════════════════════
 
 /**
- * Gera uma chave de assinatura canônica para um projeto,
- * normalizando strings (trim + lowercase) e datas para ISO.
+ * Gera uma chave de assinatura canônica para um projeto.
+ * Usa exclusivamente os campos snake_case — os mesmos enviados
+ * no POST /indicadores e comparados pelo back-end no banco.
  */
 function _assinaturaLinha(p) {
   const norm = (v) => (v == null ? "" : String(v).trim().toLowerCase());
   const normDate = (v) => {
     if (!v) return "";
+    // Suporta DD/MM/YYYY HH:MM:SS (formato do CSV brasileiro)
+    const br = String(v).match(
+      /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})$/,
+    );
+    if (br) {
+      const iso = `${br[3]}-${br[2]}-${br[1]}T${br[4]}:${br[5]}:${br[6]}`;
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? norm(v) : d.toISOString();
+    }
     const d = new Date(v);
     return isNaN(d.getTime()) ? norm(v) : d.toISOString();
   };
@@ -527,17 +538,17 @@ function _assinaturaLinha(p) {
     norm(p.empresa),
     norm(p.responsavel),
     norm(p.email),
-    norm(p.titulo),
-    norm(p.descricaoDesafio),
+    norm(p.titulo_desafio), // snake_case — alinhado com o back-end
+    norm(p.descricao_desafio),
     norm(p.descricao),
-    norm(p.areaPrimaria),
-    norm(p.areaSecundaria),
+    norm(p.area_primaria),
+    norm(p.area_secundaria),
     norm(p.resumo),
-    norm(p.ods1),
-    norm(p.ods2),
-    norm(p.ods3),
-    norm(p.impactoSocialDireto),
-    norm(p.impactoSocialIndireto),
+    norm(p.ods_1),
+    norm(p.ods_2),
+    norm(p.ods_3),
+    norm(p.impacto_social_direto_num),
+    norm(p.impacto_social_indireto_num),
     norm(p.eixo),
     norm(p.natureza),
   ].join("||");
@@ -546,7 +557,7 @@ function _assinaturaLinha(p) {
 /**
  * Recebe o array de projetos parseados e retorna apenas as linhas únicas.
  * A primeira ocorrência de cada combinação é mantida; as seguintes removidas.
- * Retorna { unicos, removidos } para poder exibir no toast se necessário.
+ * Retorna { unicos, removidos } para exibir no toast se necessário.
  */
 function _deduplicarCSV(projetos) {
   const visto = new Set();

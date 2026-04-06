@@ -15,61 +15,27 @@ type DesafioIgnorado = {
   motivo: string;
 };
 
-type ProjetoInput = {
-  postado?: string | null;
-  tipo?: string | null;
-  empresa?: string | null;
-  responsavel?: string | null;
-  email?: string | null;
-  titulo?: string | null;
-  descricaoDesafio?: string | null;
-  descricao?: string | null;
-  areaPrimaria?: string | null;
-  areaSecundaria?: string | null;
-  resumo?: string | null;
-  ods1?: string | number | null;
-  ods2?: string | number | null;
-  ods3?: string | number | null;
-  impactoSocialDireto?: number | null;
-  impactoSocialIndireto?: number | null;
-  eixo?: string | null;
-  natureza?: string | null;
-};
-
+// ── parsePostado: única versão, trata DD/MM/YYYY HH:MM:SS e ISO ──────────────
 function parsePostado(value: unknown): Date | null {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
+  }
   if (typeof value !== "string") return null;
 
   const raw = value.trim();
   if (!raw) return null;
 
+  // Formato brasileiro: DD/MM/YYYY HH:MM:SS
   const br = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})$/);
-
   if (br) {
     const iso = `${br[3]}-${br[2]}-${br[1]}T${br[4]}:${br[5]}:${br[6]}`;
     const parsed = new Date(iso);
     return Number.isNaN(parsed.getTime()) ? null : parsed;
   }
 
+  // ISO e outros formatos reconhecidos pelo motor JS
   const parsed = new Date(raw.replace(" ", "T"));
   return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function normText(value: string | null): string {
-  return (value ?? "").trim().toLowerCase();
-}
-
-function desafioKey(item: {
-  empresa: string | null;
-  titulo_desafio: string | null;
-  descricao_desafio: string | null;
-  postado: Date | null;
-}): string {
-  return [
-    normText(item.empresa),
-    normText(item.titulo_desafio),
-    normText(item.descricao_desafio),
-    item.postado ? item.postado.toISOString() : "",
-  ].join("|");
 }
 
 @Injectable()
@@ -86,17 +52,15 @@ export class AppService {
     const ignorados: DesafioIgnorado[] = [];
 
     for (const desafio of desafios) {
-      const postadoDate = this.parsePostado(desafio.postado);
+      const postadoDate = parsePostado(desafio.postado);
 
-      // ── Camada 1: verifica por postado (campo único no schema) ──────
+      // ── Camada 1: verifica por postado (campo único no schema) ──────────────
       if (postadoDate) {
         const existePorPostado = await this.prisma.desafios
           .findUnique({ where: { postado: postadoDate } })
           .catch(() => null);
 
         if (existePorPostado) {
-          // Ainda assim confere se TODOS os campos são iguais para dar
-          // uma mensagem mais precisa ao chamador
           const ehLinhaIdentica = this.compararCampos(
             existePorPostado,
             desafio,
@@ -113,8 +77,6 @@ export class AppService {
       }
 
       // ── Camada 2: verifica linha completamente idêntica em todos os campos ──
-      // Cobre casos onde postado é nulo ou onde o mesmo conteúdo foi postado
-      // em horários diferentes mas com todos os outros campos iguais.
       const duplicataCompleta = await this.encontrarLinhaIdentica(
         desafio,
         postadoDate,
@@ -127,10 +89,7 @@ export class AppService {
         continue;
       }
 
-      // ── Sem duplicata: insere ──────────────────────────────────────
-      // Monta explicitamente apenas os campos que existem no schema Prisma.
-      // O front-end pode enviar aliases camelCase (titulo, ods1, etc.) que
-      // nao existem no banco e causam PrismaClientValidationError se espalhados.
+      // ── Sem duplicata: insere ───────────────────────────────────────────────
       const parseOds = (v: unknown): number | null => {
         if (v === null || v === undefined || v === "") return null;
         const n = Number(v);
@@ -159,8 +118,24 @@ export class AppService {
         natureza: desafio.natureza ?? null,
       };
 
-      const desafioCreated = await this.prisma.desafios.create({ data });
-      salvos.push(desafioCreated);
+      try {
+        const desafioCreated = await this.prisma.desafios.create({ data });
+        salvos.push(desafioCreated);
+      } catch (err: unknown) {
+        // Captura violação de unique key (race condition entre requests paralelos)
+        const isUniqueViolation =
+          err instanceof Prisma.PrismaClientKnownRequestError &&
+          err.code === "P2002";
+
+        if (isUniqueViolation) {
+          ignorados.push({
+            desafio,
+            motivo: "Registro inserido por outro processo simultaneamente",
+          });
+        } else {
+          throw err;
+        }
+      }
     }
 
     return {
@@ -170,10 +145,6 @@ export class AppService {
     };
   }
 
-  // ────────────────────────────────────────────────────────────────
-  //  Busca no banco um registro com exatamente os mesmos valores em
-  //  todos os campos (exceto id, que é autoincrement).
-  // ────────────────────────────────────────────────────────────────
   private async encontrarLinhaIdentica(
     desafio: DesafioInput,
     postadoDate: Date | null,
@@ -181,7 +152,6 @@ export class AppService {
     const norm = (v: unknown) =>
       v === undefined || v === null || v === "" ? null : v;
 
-    // Monta filtro com todos os campos não-nulos presentes no input
     const where: Prisma.desafiosWhereInput = {
       postado: postadoDate ?? null,
       tipo: norm(desafio.tipo) as string | null,
@@ -210,10 +180,6 @@ export class AppService {
     return this.prisma.desafios.findFirst({ where }).catch(() => null);
   }
 
-  // ────────────────────────────────────────────────────────────────
-  //  Compara campo a campo entre um registro salvo e um input.
-  //  Usado para enriquecer a mensagem de motivo do ignorado.
-  // ────────────────────────────────────────────────────────────────
   private compararCampos(
     salvo: Desafio,
     input: DesafioInput,
@@ -245,12 +211,6 @@ export class AppService {
       norm(salvo.eixo) === norm(input.eixo) &&
       norm(salvo.natureza) === norm(input.natureza)
     );
-  }
-
-  private parsePostado(postado: DesafioInput["postado"]): Date | null {
-    if (!postado) return null;
-    const parsedDate = postado instanceof Date ? postado : new Date(postado);
-    return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
   }
 
   async apagarTodosDados(): Promise<{ count: number }> {
