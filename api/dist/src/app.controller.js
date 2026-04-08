@@ -51,8 +51,8 @@ __decorate([
 ], AppController.prototype, "criarDesafios", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: "Remove todos os desafios salvos no banco" }),
-    ApiResponse({ status: 200, description: "Dados removidos com sucesso." }),
-    Delete("dados"),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Dados removidos com sucesso." }),
+    (0, common_1.Delete)("dados"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)

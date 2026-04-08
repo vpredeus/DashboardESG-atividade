@@ -9,6 +9,7 @@ type DesafioIgnorado = {
 };
 export declare class AppService {
     private prisma;
+    private readonly logger;
     constructor(prisma: PrismaService);
     getDados(): Promise<{
         postado: Date | null;
@@ -61,7 +62,6 @@ export declare class AppService {
     }>;
     private encontrarLinhaIdentica;
     private compararCampos;
-    private parsePostado;
     apagarTodosDados(): Promise<{
         count: number;
     }>;

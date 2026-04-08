@@ -8,11 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var AppService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const client_1 = require("@prisma/client");
 function parsePostado(value) {
+    if (value instanceof Date) {
+        return Number.isNaN(value.getTime()) ? null : value;
+    }
     if (typeof value !== "string")
         return null;
     const raw = value.trim();
@@ -27,19 +32,9 @@ function parsePostado(value) {
     const parsed = new Date(raw.replace(" ", "T"));
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
-function normText(value) {
-    return (value ?? "").trim().toLowerCase();
-}
-function desafioKey(item) {
-    return [
-        normText(item.empresa),
-        normText(item.titulo_desafio),
-        normText(item.descricao_desafio),
-        item.postado ? item.postado.toISOString() : "",
-    ].join("|");
-}
-let AppService = class AppService {
+let AppService = AppService_1 = class AppService {
     prisma;
+    logger = new common_1.Logger(AppService_1.name);
     constructor(prisma) {
         this.prisma = prisma;
     }
@@ -50,7 +45,7 @@ let AppService = class AppService {
         const salvos = [];
         const ignorados = [];
         for (const desafio of desafios) {
-            const postadoDate = this.parsePostado(desafio.postado);
+            const postadoDate = parsePostado(desafio.postado);
             if (postadoDate) {
                 const existePorPostado = await this.prisma.desafios
                     .findUnique({ where: { postado: postadoDate } })
@@ -100,8 +95,23 @@ let AppService = class AppService {
                 eixo: desafio.eixo ?? null,
                 natureza: desafio.natureza ?? null,
             };
-            const desafioCreated = await this.prisma.desafios.create({ data });
-            salvos.push(desafioCreated);
+            try {
+                const desafioCreated = await this.prisma.desafios.create({ data });
+                salvos.push(desafioCreated);
+            }
+            catch (err) {
+                const isUniqueViolation = err instanceof client_1.Prisma.PrismaClientKnownRequestError &&
+                    err.code === "P2002";
+                if (isUniqueViolation) {
+                    ignorados.push({
+                        desafio,
+                        motivo: "Registro inserido por outro processo simultaneamente",
+                    });
+                }
+                else {
+                    throw err;
+                }
+            }
         }
         return {
             salvos: salvos.length,
@@ -157,26 +167,20 @@ let AppService = class AppService {
             norm(salvo.eixo) === norm(input.eixo) &&
             norm(salvo.natureza) === norm(input.natureza));
     }
-    parsePostado(postado) {
-        if (!postado)
-            return null;
-        const parsedDate = postado instanceof Date ? postado : new Date(postado);
-        return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
-    }
     async apagarTodosDados() {
         try {
             const result = await this.prisma.desafios.deleteMany();
-            this.logger.log(`🗑️ ${result.count} registros removidos do banco.`);
+            common_1.Logger.log(`🗑️ ${result.count} registros removidos do banco.`);
             return { count: result.count };
         }
         catch (error) {
-            this.logger.error("Erro ao apagar dados do banco:", error);
-            throw new InternalServerErrorException("Falha ao apagar os dados do banco.");
+            common_1.Logger.error("Erro ao apagar dados do banco:", error);
+            throw new common_1.InternalServerErrorException("Falha ao apagar os dados do banco.");
         }
     }
 };
 exports.AppService = AppService;
-exports.AppService = AppService = __decorate([
+exports.AppService = AppService = AppService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], AppService);
