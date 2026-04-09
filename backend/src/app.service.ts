@@ -3,7 +3,7 @@ import {
   Logger,
   InternalServerErrorException,
 } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
+import { PrismaService } from "./prisma/prisma.service";
 import { Prisma, desafios as Desafio } from "@prisma/client";
 
 export type DesafioInput = Omit<Prisma.desafiosCreateInput, "postado"> & {
