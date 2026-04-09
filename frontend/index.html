@@ -11,14 +11,240 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
     <link rel="icon" href="./images/esg_logo.png" type="image/png" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      /* ══════════════════════════════════════════════════
+         UPLOAD CARD — usado tanto no inline quanto no modal
+         Fundo escuro, borda amarela, idêntico nos dois contextos
+      ══════════════════════════════════════════════════ */
+      .upload-card {
+        background: linear-gradient(145deg, #0d1123 0%, #141c4a 100%);
+        border-radius: 24px;
+        padding: 40px 44px;
+        border: 1px solid rgba(255, 215, 0, 0.18);
+        box-shadow:
+          0 0 0 1px rgba(255, 215, 0, 0.06),
+          0 24px 64px rgba(0, 0, 0, 0.55),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        position: relative;
+      }
+
+      .upload-card-header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .upload-card-header h2 {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #fff;
+        margin: 12px 0 8px;
+        letter-spacing: -0.3px;
+      }
+      .upload-card-header h2 i {
+        color: var(--eniac-amarelo);
+        font-size: 1.1rem;
+        margin: 0 6px;
+      }
+      .upload-card-header p {
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 0.88rem;
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      /* ── Bloco inline — sem overlay, dentro do fluxo da página ── */
+      .upload-inline-section {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 48px 24px 56px;
+      }
+
+      /* ── Modal com overlay (botão "Importar novo CSV") ── */
+      .upload-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(8, 10, 28, 0.82);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .upload-modal-overlay.show {
+        display: flex;
+      }
+      .upload-modal-overlay .upload-card {
+        max-width: 680px;
+        width: 100%;
+        animation: modalIn 0.28s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+      }
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: translateY(28px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* Botão X fechar modal */
+      .upload-modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        line-height: 1;
+      }
+      .upload-modal-close:hover {
+        background: rgba(255, 215, 0, 0.15);
+        border-color: rgba(255, 215, 0, 0.4);
+        color: var(--eniac-amarelo);
+      }
+
+      /* ── Botão destacado "Importar novo CSV" no dashboard ── */
+      .novo-csv-banner {
+        max-width: 1200px;
+        margin: 32px auto 0;
+        padding: 0 24px;
+      }
+      .novo-csv-btn-destaque {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        padding: 18px 28px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 215, 0, 0.25);
+        background: linear-gradient(
+          135deg,
+          rgba(20, 28, 74, 0.9) 0%,
+          rgba(13, 17, 35, 0.95) 100%
+        );
+        color: #fff;
+        font-family: "Sora", sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.22s;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        text-align: left;
+      }
+      .novo-csv-btn-destaque:hover {
+        border-color: rgba(255, 215, 0, 0.55);
+        background: linear-gradient(
+          135deg,
+          rgba(31, 43, 108, 0.95) 0%,
+          rgba(20, 28, 74, 1) 100%
+        );
+        box-shadow: 0 6px 28px rgba(255, 215, 0, 0.12);
+        transform: translateY(-2px);
+      }
+      .novo-csv-btn-destaque .btn-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(255, 215, 0, 0.12);
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--eniac-amarelo);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        transition: all 0.22s;
+      }
+      .novo-csv-btn-destaque:hover .btn-icon {
+        background: rgba(255, 215, 0, 0.2);
+        border-color: rgba(255, 215, 0, 0.4);
+      }
+      .novo-csv-btn-destaque .btn-text {
+        flex: 1;
+      }
+      .novo-csv-btn-destaque .btn-text span {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.38);
+        margin-top: 2px;
+        letter-spacing: 0.2px;
+      }
+      .novo-csv-btn-destaque .btn-arrow {
+        color: rgba(255, 215, 0, 0.5);
+        font-size: 0.9rem;
+        transition: transform 0.2s;
+      }
+      .novo-csv-btn-destaque:hover .btn-arrow {
+        transform: translateX(4px);
+        color: var(--eniac-amarelo);
+      }
+
+      /* ── Estado loading/erro ── */
+      .loading-state,
+      .error-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 80px 24px;
+        text-align: center;
+        color: var(--texto-muted);
+      }
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(31, 43, 108, 0.15);
+        border-top-color: var(--eniac-azul);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .error-icon {
+        font-size: 2rem;
+      }
+      .error-state button {
+        padding: 10px 24px;
+        border-radius: 8px;
+        background: var(--eniac-azul);
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 700;
+        font-family: "Sora", sans-serif;
+      }
+    </style>
   </head>
   <body>
+    <!-- ── HEADER ── -->
     <header>
       <div class="logo">
         <span class="logo-mark">⬡</span>
@@ -26,16 +252,26 @@
       </div>
       <nav id="menu">
         <a href="index.html" class="active">Projetos &amp; Dashboard</a>
-        <a href="./html/quem-somos.html">Quem Somos</a>
         <a href="./html/impactos.html">Impactos e Valores</a>
+        <a href="./html/quem-somos.html">Quem Somos</a>
+        <a
+          href="./html/login.html"
+          class="nav-profile-btn"
+          title="Perfil / Entrar"
+        >
+          <i class="fa-solid fa-circle-user"></i>
+        </a>
       </nav>
       <div class="menu-btn" onclick="toggleMenu()">☰</div>
     </header>
 
+    <!-- ── HERO ── -->
     <section class="hero">
       <div class="hero-bg-grid"></div>
       <div class="hero-content" data-aos="fade-right" data-aos-duration="550">
-        <span class="hero-tag">Sustentabilidade em Ação</span>
+        <span class="hero-tag"
+          >Sustentabilidade e Engenharia Social em Ação</span
+        >
         <h1 class="hero-title">Iniciativas que <br /><em>Transformam</em></h1>
         <p class="hero-subtitle">
           Gerenciamos projetos sociais e ambientais com foco em impacto real,
@@ -43,18 +279,18 @@
         </p>
         <div class="hero-stats">
           <div class="stat">
-            <span class="stat-num" id="stat-total">—</span
-            ><span class="stat-label">Projetos Ativos</span>
+            <span class="stat-num" id="stat-total">—</span>
+            <span class="stat-label">Projetos Ativos</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <span class="stat-num" id="stat-impacto">—</span
-            ><span class="stat-label">Pontos de Impacto</span>
+            <span class="stat-num" id="stat-impacto">—</span>
+            <span class="stat-label">Pontos de Impacto</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <span class="stat-num" id="stat-cats">—</span
-            ><span class="stat-label">Categorias ESG</span>
+            <span class="stat-num" id="stat-cats">—</span>
+            <span class="stat-label">Categorias ESG</span>
           </div>
         </div>
       </div>
@@ -64,7 +300,6 @@
         data-aos-duration="550"
         data-aos-delay="100"
       >
-        <!-- Hexágono externo — gira rápido -->
         <div class="orbit-ring ring-1">
           <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
             <polygon
@@ -82,8 +317,6 @@
             />
           </svg>
         </div>
-
-        <!-- Hexágono interno — estático, orbe vai e volta -->
         <div class="orbit-ring ring-2">
           <svg
             viewBox="0 0 154 154"
@@ -96,7 +329,6 @@
               stroke="rgba(255,215,0,0.38)"
               stroke-width="1.2"
             />
-            <!-- Orbe animado com offset-path percorrendo o hexágono -->
             <circle
               r="4"
               fill="#ffd700"
@@ -105,53 +337,188 @@
             />
           </svg>
         </div>
-
         <div class="orbit-center">ESG</div>
       </div>
     </section>
 
-    <!-- Estados de carregamento -->
-    <div id="loading-state" class="loading-state">
+    <!-- ══════════════════════════════════════════════════════════
+         ESTADOS DE CARREGAMENTO / ERRO DO SERVIDOR
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="loading-state" class="loading-state" style="display: none">
       <div class="loading-spinner"></div>
-      <p>Carregando dados da API...</p>
+      <p>Carregando dados do servidor...</p>
     </div>
     <div id="error-state" class="error-state" style="display: none">
       <span class="error-icon">⚠️</span>
-      <p id="error-msg">Não foi possível conectar à API.</p>
-      <button onclick="carregarDados()">Tentar novamente</button>
+      <p id="error-msg">Não foi possível carregar os dados.</p>
+      <button onclick="_iniciarApp()">Tentar novamente</button>
     </div>
 
-    <div id="main-content" style="display: none">
-      <!-- ── PORTFÓLIO: imagens filtráveis + cards ── -->
-      <section class="section-label">
-        <div
-          class="section-label-inner"
-          data-aos="fade-up"
-          data-aos-duration="550"
-        >
-          <span class="pill">Portfólio de Iniciativas</span>
-          <h2>Projetos por Área</h2>
-          <p>Clique em uma área para filtrar os projetos abaixo.</p>
-        </div>
-      </section>
+    <!-- ══════════════════════════════════════════════════════════
+         BLOCO DE UPLOAD INLINE — primeira visita, sem dados
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="upload-inline-wrap">
+      <div
+        class="upload-inline-section"
+        data-aos="fade-up"
+        data-aos-duration="500"
+      >
+        <div class="upload-card">
+          <div class="upload-card-header">
+            <span
+              class="pill"
+              style="
+                background: rgba(255, 215, 0, 0.12);
+                color: var(--eniac-amarelo);
+                border: 1px solid rgba(255, 215, 0, 0.25);
+              "
+            >
+              <i class="fa-solid fa-file-csv" style="margin-right: 6px"></i>
+              Importar Dados
+            </span>
+            <h2>
+              Processamento CSV
+              <i class="fa-solid fa-right-left"></i> Dashboards
+            </h2>
+            <p>
+              Faça o upload do seu arquivo de indicadores para sincronizar com o
+              banco de dados e gerar automaticamente todos os gráficos.
+            </p>
+          </div>
 
-      <div class="portfolio-wrapper">
-        <!-- Botões de área (imagens) -->
-        <div
-          class="area-filters"
-          id="area-filters"
-          data-aos="zoom-in"
-          data-aos-duration="550"
-          data-aos-delay="60"
-        ></div>
-        <!-- Cards filtráveis -->
-        <div
-          class="cards-portfolio"
-          id="cards-portfolio"
-          data-aos="fade-up"
-          data-aos-duration="550"
-          data-aos-delay="100"
-        ></div>
+          <div class="upload-wrapper">
+            <div
+              class="drop-zone"
+              id="dropZone"
+              onclick="document.getElementById('fileInput').click()"
+            >
+              <div class="dz-icon-wrap">
+                <i class="fa-solid fa-file-circle-plus" id="dzIcon"></i>
+              </div>
+              <div class="dz-title" id="dzTitle">Arraste seu arquivo aqui</div>
+              <div class="dz-subtitle" id="dzSub">
+                ou <strong>clique para selecionar</strong>
+              </div>
+              <span class="dz-badge" id="dzBadge">
+                <i
+                  class="fa-solid fa-lock"
+                  style="font-size: 10px; margin-right: 4px"
+                ></i>
+                Apenas .csv
+              </span>
+              <input type="file" id="fileInput" accept=".csv" />
+            </div>
+
+            <div class="progress-wrap" id="progressWrap">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div class="file-preview" id="filePreview">
+              <i class="fa-solid fa-file-circle-check fp-icon"></i>
+              <div class="fp-info">
+                <div class="fp-name" id="fpName">arquivo.csv</div>
+                <div class="fp-meta" id="fpMeta">—</div>
+              </div>
+              <button class="fp-remove" onclick="clearUpload()">
+                <i class="fa-solid fa-xmark" style="margin-right: 4px"></i
+                >Remover
+              </button>
+            </div>
+
+            <div class="upload-cta">
+              <button
+                class="btn-gerar"
+                id="btnGerar"
+                disabled
+                onclick="processarCSV()"
+              >
+                <i class="fa-solid fa-chart-line"></i>
+                Gerar Dashboards
+              </button>
+              <button class="btn-limpar" id="btnLimpar" onclick="clearUpload()">
+                <i class="fa-solid fa-rotate-left"></i>
+                Limpar
+              </button>
+            </div>
+
+            <div class="csv-preview-section" id="csvPreviewSection">
+              <div class="csv-preview-title">
+                <i class="fa-solid fa-table-cells-large"></i>
+                Pré-visualização — primeiras 5 linhas
+              </div>
+              <div class="csv-table-wrap">
+                <table class="csv-table" id="csvTable"></table>
+              </div>
+              <div class="csv-preview-more" id="csvPreviewMore"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         MODAL DE UPLOAD — abre ao clicar em "Importar novo CSV"
+    ═══════════════════════════════════════════════════════════ -->
+    <div
+      class="upload-modal-overlay"
+      id="uploadModalOverlay"
+      onclick="fecharModal(event)"
+    >
+      <div class="upload-card" style="max-width: 680px; width: 100%">
+        <!-- Botão X -->
+        <button
+          class="upload-modal-close"
+          id="uploadModalClose"
+          onclick="fecharPainelUpload()"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="upload-card-header">
+          <span
+            class="pill"
+            style="
+              background: rgba(255, 215, 0, 0.12);
+              color: var(--eniac-amarelo);
+              border: 1px solid rgba(255, 215, 0, 0.25);
+            "
+          >
+            <i class="fa-solid fa-file-csv" style="margin-right: 6px"></i>
+            Importar Dados
+          </span>
+          <h2>
+            Processamento CSV <i class="fa-solid fa-right-left"></i> Dashboards
+          </h2>
+          <p>
+            Faça o upload do seu arquivo de indicadores para sincronizar com o
+            banco de dados e gerar automaticamente todos os gráficos.
+          </p>
+        </div>
+
+        <div class="upload-wrapper" id="modal-upload-wrapper">
+          <!-- conteúdo preenchido via JS ao abrir o modal -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         CONTEÚDO PRINCIPAL — aparece após dados carregados
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="main-content" style="display: none">
+      <!-- Bloco destacado para importar novo CSV -->
+      <div class="novo-csv-banner" data-aos="fade-up" data-aos-duration="400">
+        <button class="novo-csv-btn-destaque" onclick="mostrarPainelUpload()">
+          <div class="btn-icon">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+          </div>
+          <div class="btn-text">
+            Importar novo CSV
+            <span
+              >Sincronize novos dados com o banco e atualize os dashboards</span
+            >
+          </div>
+          <i class="fa-solid fa-chevron-right btn-arrow"></i>
+        </button>
       </div>
 
       <!-- ── DASHBOARD ── -->
@@ -164,8 +531,8 @@
           <span class="pill">Métricas</span>
           <h2>Dashboard de Impacto</h2>
           <p>
-            Consolidação visual dos dados por evolução, ODS, categoria e área de
-            atuação.
+            Consolidação visual dos dados de acordo ao ODS, eixo, natureza e
+            área de atuação.
           </p>
         </div>
       </section>
@@ -182,8 +549,8 @@
         <div class="dash-row">
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Evolução de Projetos por Ano</span
-              ><span class="chart-badge">Linha</span>
+              <span class="chart-title">Evolução de Projetos por Ano</span>
+              <span class="chart-badge">Linha</span>
             </div>
             <div
               class="chart-canvas-wrap"
@@ -196,8 +563,8 @@
           </div>
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Projetos por ODS</span
-              ><span class="chart-badge">Barras</span>
+              <span class="chart-title">Projetos por ODS</span>
+              <span class="chart-badge">Barras</span>
             </div>
             <div
               class="chart-canvas-wrap"
@@ -222,8 +589,8 @@
         <div class="dash-row" style="margin-top: 24px">
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Distribuição por Categoria</span
-              ><span class="chart-badge">Pizza</span>
+              <span class="chart-title">Distribuição por Categoria</span>
+              <span class="chart-badge">Pizza</span>
             </div>
             <div
               class="chart-canvas-wrap"
@@ -244,8 +611,8 @@
           </div>
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Projetos por Área de Atuação</span
-              ><span class="chart-badge">Radar</span>
+              <span class="chart-title">Projetos por Área de Atuação</span>
+              <span class="chart-badge">Radar</span>
             </div>
             <div
               class="chart-canvas-wrap"
@@ -262,8 +629,8 @@
         <div style="margin-top: 24px">
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Pontos de Impacto por Projeto</span
-              ><span class="chart-badge">Barras</span>
+              <span class="chart-title">Pontos de Impacto por Projeto</span>
+              <span class="chart-badge">Barras</span>
             </div>
             <div
               class="chart-canvas-wrap"
@@ -286,7 +653,42 @@
         </div>
       </main>
     </div>
+    <!-- fim #main-content -->
 
+    <!-- ── POPUP EXTENSÃO ERRADA ── -->
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup-card">
+        <button class="popup-close-btn" onclick="closePopup()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="popup-icon-wrap">
+          <i class="fa-solid fa-file-circle-xmark"></i>
+        </div>
+        <div class="popup-title">Formato não aceito</div>
+        <div class="popup-desc">
+          O arquivo <strong id="popupFileName"></strong> não é válido.<br />
+          Somente arquivos <strong>.csv</strong> são utilizados para importação
+          de dados nesse sistema.
+        </div>
+        <div class="popup-rejected-ext" id="popupRejectedExt">
+          <i
+            class="fa-solid fa-triangle-exclamation"
+            style="margin-right: 6px"
+          ></i>
+          Extensão detectada: <span id="popupExtSpan"></span>
+        </div>
+        <div class="popup-ext-pill">
+          <i class="fa-solid fa-file-circle-check"></i>
+          Extensão aceita: .csv
+        </div>
+        <button class="popup-got-it" onclick="closePopup()">
+          <i class="fa-solid fa-check"></i>
+          Entendido — selecionar outro arquivo
+        </button>
+      </div>
+    </div>
+
+    <!-- ── FOOTER ── -->
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand" data-aos="fade-up" data-aos-duration="550">
@@ -301,7 +703,7 @@
           <a href="./html/impactos.html">Impactos e Valores</a>
         </div>
         <p class="footer-copy">
-          ©
+          <i class="fa-regular fa-copyright"></i>
           <script>
             document.write(new Date().getFullYear());
           </script>
