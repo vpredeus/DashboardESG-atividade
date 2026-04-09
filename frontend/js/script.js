@@ -89,6 +89,9 @@ function formatDate(str) {
   return isNaN(d) ? str : d.toLocaleDateString("pt-BR");
 }
 
+globalThis.ESG_API_URL = "https://dashboardesg-atividade.onrender.com";
+const API_BASE = globalThis.ESG_API_URL || "http://localhost:3000";
+
 // ══════════════════════════════════════════════════════════════════
 //  ARMAZENAMENTO — IndexedDB com fallback para sessionStorage
 //  Resolve o limite de ~5 MB do sessionStorage para CSVs grandes
@@ -1009,7 +1012,6 @@ async function _iniciarApp() {
   if (contentEl) contentEl.style.display = "none";
 
   try {
-    const API_BASE = window.ESG_API_URL || "http://localhost:3000";
     const res = await fetch(`${API_BASE}/indicadores`);
     if (!res.ok) throw new Error(`Servidor respondeu com status ${res.status}`);
 
@@ -1118,7 +1120,6 @@ function _showToast(msg, type, iconClass) {
 }
 
 function enviarParaServidor(dados) {
-  const API_BASE = window.ESG_API_URL || "http://localhost:3000";
   // Envia para POST /indicadores (endpoint real do NestJS)
   return fetch(`${API_BASE}/indicadores`, {
     method: "POST",
@@ -1953,7 +1954,6 @@ async function carregarImpactos() {
   if (contentEl) contentEl.style.display = "none";
 
   try {
-    const API_BASE = window.ESG_API_URL || "http://localhost:3000";
     const res = await fetch(`${API_BASE}/indicadores`);
     if (!res.ok) throw new Error(`Servidor respondeu com status ${res.status}`);
 
