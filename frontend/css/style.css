@@ -118,6 +118,94 @@ nav a.active {
   box-shadow: 0 2px 12px rgba(255, 215, 0, 0.4);
 }
 
+/* Fade in suave ao entrar na página */
+body {
+  animation: pageEnter 0.6s ease-out forwards;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Container das camadas de transição */
+.multi-layer-transition {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cada camada (bloco de cor) */
+.layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: -100%;
+  transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+.layer-1 {
+  background: var(--eniac-amarelo);
+  z-index: 10001;
+}
+
+/* 2. Azul Médio */
+.layer-2 {
+  background: var(--eniac-amarelo-soft);
+  z-index: 10002;
+}
+
+/* 3. Transição: Verde ESG (Mescla natural entre azul e amarelo) */
+.layer-3 {
+  background: var(--eniac-azul);
+  z-index: 10003;
+}
+
+/* 4. Amarelo Suave */
+.layer-4 {
+  background: var(--eniac-azul-mid);
+  z-index: 10004;
+}
+
+/* 5. Amarelo Final (Cor principal) */
+.layer-5 {
+  background: var(--eniac-azul-deep);
+  z-index: 10005;
+}
+
+/* Fluxo de Delays: Cada uma persegue a anterior com 0.1s de diferença */
+.multi-layer-transition.active .layer-1 {
+  transform: translateX(100%);
+  transition-delay: 0s;
+}
+.multi-layer-transition.active .layer-2 {
+  transform: translateX(100%);
+  transition-delay: 0.15s;
+}
+.multi-layer-transition.active .layer-3 {
+  transform: translateX(100%);
+  transition-delay: 0.25s;
+}
+.multi-layer-transition.active .layer-4 {
+  transform: translateX(100%);
+  transition-delay: 0.25s;
+}
+.multi-layer-transition.active .layer-5 {
+  transform: translateX(100%);
+  transition-delay: 0.45s;
+}
+
 .menu-btn {
   display: none;
   font-size: 26px;
