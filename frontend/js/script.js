@@ -89,8 +89,10 @@ function formatDate(str) {
   return isNaN(d) ? str : d.toLocaleDateString("pt-BR");
 }
 
-globalThis.ESG_API_URL = "https://dashboardesg-atividade.onrender.com";
-const API_BASE = globalThis.ESG_API_URL || "http://localhost:3000";
+const API_BASE =
+  location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : "https://dashboardesg-atividade.onrender.com";
 
 // ══════════════════════════════════════════════════════════════════
 //  ARMAZENAMENTO — IndexedDB com fallback para sessionStorage
