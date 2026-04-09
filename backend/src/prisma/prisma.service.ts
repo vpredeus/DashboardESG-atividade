@@ -15,7 +15,6 @@ export class PrismaService
 
   constructor() {
     super({
-      // Passa a URL explicitamente — evita falha silenciosa se a variável de ambiente não for carregada
       datasources: {
         db: {
           url: process.env.DATABASE_URL,
@@ -31,15 +30,15 @@ export class PrismaService
   async onModuleInit() {
     try {
       await this.$connect();
-      this.logger.log("✅ Conexão com o banco de dados estabelecida.");
+      this.logger.log("Conexao com o banco de dados estabelecida.");
     } catch (error) {
-      this.logger.error("❌ Falha ao conectar ao banco de dados:", error);
-      process.exit(1); // encerra se não conseguir conectar
+      this.logger.error("Falha ao conectar ao banco de dados:", error);
+      process.exit(1);
     }
   }
 
   async onModuleDestroy() {
     await this.$disconnect();
-    this.logger.log("🔌 Conexão com o banco encerrada.");
+    this.logger.log("Conexao com o banco encerrada.");
   }
 }
