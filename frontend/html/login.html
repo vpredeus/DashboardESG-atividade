@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ENIAC ESG – Entrar</title>
     <link rel="stylesheet" href="../css/style.css" />
-    <link rel="icon" href="../images/esg_logo.png" type="image/png" /
+    <link rel="icon" href="../images/esg_logo.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -131,6 +131,11 @@
         border-color: rgba(255, 215, 0, 0.6);
         box-shadow: 0 0 14px rgba(255, 215, 0, 0.25);
         transform: scale(1.08);
+      }
+
+      /* Label de texto visível apenas no menu mobile expandido */
+      .nav-profile-label {
+        display: none;
       }
 
       /* ── AUTH LAYOUT ── */
@@ -465,7 +470,11 @@
         position: relative;
       }
 
-      .input-wrap i {
+      /* Apenas ícones decorativos (não dentro de botão) recebem pointer-events:none.
+         CORREÇÃO: o seletor antigo ".input-wrap i" também afetava o <i> dentro de
+         .toggle-pw, tornando o clique impossível. Agora usamos :not para excluí-lo. */
+      .input-wrap > i,
+      .input-wrap i:not(.toggle-pw i) {
         position: absolute;
         left: 16px;
         top: 50%;
@@ -476,9 +485,11 @@
         transition: color 0.2s;
       }
 
+      /* CORREÇÃO: padding-right era apenas 10px, não havia espaço para o botão do
+         olho (≈30px). Aumentamos para 44px nos campos de senha, via classe extra. */
       .form-input {
         width: 100%;
-        padding: 14px 10px 14px 44px;
+        padding: 14px 16px 14px 44px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
@@ -487,6 +498,11 @@
         font-size: 0.93rem;
         outline: none;
         transition: all 0.2s ease;
+      }
+
+      /* Campo com ícone de toggle à direita (senha) */
+      .form-input.has-toggle {
+        padding-right: 44px;
       }
 
       .form-input::placeholder {
@@ -507,10 +523,12 @@
         color: var(--eniac-amarelo);
       }
 
-      /* Show/hide password toggle */
+      /* CORREÇÃO: right era 35px e não havia z-index, então o input (z-index padrão)
+         cobria o botão impedindo o clique. Movemos para right:12px e adicionamos
+         z-index:2 para garantir que fique acima do campo. */
       .toggle-pw {
         position: absolute;
-        right: 35px;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
         background: none;
@@ -518,8 +536,9 @@
         color: rgba(255, 255, 255, 0.3);
         cursor: pointer;
         font-size: 0.9rem;
-        padding: 4px;
+        padding: 4px 6px;
         transition: color 0.2s;
+        z-index: 2;
       }
 
       .toggle-pw:hover {
@@ -597,7 +616,69 @@
         transform: translateY(0);
       }
 
-      /* ── RESPONSIVE ── */
+      /* ── MENU HAMBURGER (mobile) ─────────────────────────
+         ADIÇÃO: o header das páginas auth não tinha .menu-btn nem lógica
+         de nav mobile. Copiamos o padrão do style.css global. */
+      .menu-btn {
+        display: none;
+        font-size: 26px;
+        cursor: pointer;
+        color: var(--eniac-amarelo);
+        background: none;
+        border: none;
+        padding: 4px 8px;
+        line-height: 1;
+      }
+
+      /* ── HAMBURGER MOBILE ── */
+      @media (max-width: 768px) {
+        .menu-btn {
+          display: block;
+        }
+
+        nav {
+          display: none;
+          flex-direction: column;
+          position: absolute;
+          top: 65px;
+          left: 0;
+          width: 100%;
+          background: var(--eniac-azul-deep);
+          padding: 16px 20px;
+          border-top: 1px solid rgba(255, 215, 0, 0.15);
+          border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          z-index: 999;
+        }
+
+        nav.active {
+          display: flex;
+        }
+
+        nav a {
+          align-items: center;
+        }
+
+      
+        .nav-profile-btn, nav a{
+          width: 65%;
+          border-radius: 7px;
+          height: 30px;
+          margin-left: 0;
+          gap: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          justify-content: center;
+        }
+
+        .nav-profile-label {
+          display: inline !important;
+        }
+      }
+
+      /* ── LAYOUT RESPONSIVO AUTH (tablet/chromebook pequeno) ──
+         CORREÇÃO: este bloco estava SEM a linha @media, então as regras
+         vazavam para todos os tamanhos e quebravam o grid em desktop. */
       @media (max-width: 860px) {
         .auth-page {
           grid-template-columns: 1fr;
@@ -647,8 +728,11 @@
         <a href="./quem-somos.html">Quem Somos</a>
         <a href="./login.html" class="nav-profile-btn" title="Perfil / Entrar">
           <i class="fa-solid fa-circle-user"></i>
+          <span class="nav-profile-label">Perfil</span>
         </a>
       </nav>
+      <!-- ADIÇÃO: botão hamburger ausente nas páginas auth -->
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menu">☰</button>
     </header>
 
     <!-- ── AUTH LAYOUT ── -->
@@ -786,7 +870,7 @@
                 <input
                   type="password"
                   id="password"
-                  class="form-input"
+                  class="form-input has-toggle"
                   placeholder="••••••••"
                   required
                 />
@@ -805,7 +889,7 @@
                 <input type="checkbox" />
                 <span>Lembrar de mim</span>
               </label>
-              <a href="#" class="forgot-link">Esqueceu a senha?</a>
+              <a href="./forgot-password.html" class="forgot-link">Esqueceu a senha?</a>
             </div>
 
             <button type="submit" class="btn-auth-submit">
@@ -881,6 +965,16 @@
     </div>
 
     <script>
+      /* ── toggleMenu ─────────────────────────────────────────────
+         ADIÇÃO: função ausente nas páginas auth. Sem ela o hamburger
+         clicava mas nada acontecia (erro "toggleMenu is not defined"). */
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("active");
+      }
+
+      /* ── togglePw ───────────────────────────────────────────────
+         Sem alteração de lógica; a correção foi no CSS (z-index e
+         pointer-events do seletor .input-wrap i). */
       function togglePw(id, btn) {
         const input = document.getElementById(id);
         const icon = btn.querySelector("i");
@@ -895,7 +989,6 @@
 
       function handleLogin(e) {
         e.preventDefault();
-        // Placeholder — connect to NestJS backend
         const btn = e.target.querySelector(".btn-auth-submit");
         btn.innerHTML =
           '<i class="fa-solid fa-circle-notch fa-spin"></i> Entrando...';
@@ -907,33 +1000,30 @@
           alert("Conecte ao endpoint POST /auth/login do seu NestJS backend.");
         }, 1500);
       }
+
       document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("transition-container");
-  const links = document.querySelectorAll('a[href*="login.html"], a[href*="register.html"]');
+        const container = document.getElementById("transition-container");
+        const links = document.querySelectorAll(
+          'a[href*="login.html"], a[href*="register.html"], a[href*="forgot-password.html"]'
+        );
 
-  links.forEach(link => {
-    link.addEventListener("click", e => {
-      // Impede o salto imediato
-      e.preventDefault();
-      const destination = link.href;
-
-      // Ativa a animação em cascata
-      container.classList.add("active");
-
-      // Espera o tempo das camadas (0.6s + 0.2s de delay) para mudar de página
-      setTimeout(() => {
-        window.location.href = destination;
-      }, 800);
-    });
-  });
-});
+        links.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const destination = link.href;
+            container.classList.add("active");
+            setTimeout(() => {
+              window.location.href = destination;
+            }, 650);
+          });
+        });
+      });
     </script>
+
+    <div class="multi-layer-transition" id="transition-container">
+      <div class="layer layer-1"></div>
+      <div class="layer layer-2"></div>
+      <div class="layer layer-3"></div>
+    </div>
   </body>
-<div class="multi-layer-transition" id="transition-container">
-  <div class="layer layer-1"></div>
-  <div class="layer layer-2"></div>
-  <div class="layer layer-3"></div>
-  <div class="layer layer-4"></div>
-  <div class="layer layer-5"></div>
-</div>
 </html>

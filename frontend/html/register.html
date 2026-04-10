@@ -135,6 +135,11 @@
         transform: scale(1.08);
       }
 
+      /* Label de texto visível apenas no menu mobile expandido */
+      .nav-profile-label {
+        display: none;
+      }
+
       /* ── AUTH LAYOUT ── */
       .auth-page {
         min-height: calc(100vh - 70px);
@@ -520,7 +525,32 @@
         box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.08);
       }
 
-      /* Password strength bar */
+      /* CORREÇÃO: mesmo problema do login — seletor genérico bloqueava o botão.
+         Aqui o register usava .field-icon como classe, então o seletor era mais
+         específico. Mantemos assim e garantimos z-index no .toggle-pw. */
+      .toggle-pw {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.28);
+        cursor: pointer;
+        font-size: 0.88rem;
+        padding: 4px 6px;
+        transition: color 0.2s;
+        z-index: 2;
+      }
+
+      .toggle-pw:hover {
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      /* Campo com ícone toggle à direita */
+      .form-input.has-toggle {
+        padding-right: 44px;
+      }
       .pw-strength {
         margin-top: 8px;
         display: none;
@@ -628,6 +658,63 @@
         transform: translateY(0);
       }
 
+      /* ── MENU HAMBURGER (mobile) ─────────────────────────
+         ADIÇÃO: idem ao login.html — header não tinha hamburger. */
+      .menu-btn {
+        display: none;
+        font-size: 26px;
+        cursor: pointer;
+        color: var(--eniac-amarelo);
+        background: none;
+        border: none;
+        padding: 4px 8px;
+        line-height: 1;
+      }
+
+      @media (max-width: 768px) {
+        .menu-btn {
+          display: block;
+        }
+
+        nav {
+          display: none;
+          flex-direction: column;
+          position: absolute;
+          top: 65px;
+          left: 0;
+          width: 100%;
+          background: var(--eniac-azul-deep);
+          padding: 20px;
+          border-top: 1px solid rgba(255, 215, 0, 0.15);
+          border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          z-index: 999;
+        }
+
+        nav.active {
+          display: flex;
+        }
+
+        nav a {
+          text-align: center;
+        }
+
+        .nav-profile-btn {
+          width: 100%;
+          border-radius: 12px;
+          height: 44px;
+          margin-left: 0;
+          gap: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          justify-content: center;
+        }
+
+        .nav-profile-label {
+          display: inline !important;
+        }
+      }
+
       /* ── RESPONSIVE ── */
       @media (max-width: 860px) {
         .auth-page {
@@ -684,8 +771,13 @@
         <a href="./quem-somos.html">Quem Somos</a>
         <a href="./login.html" class="nav-profile-btn" title="Perfil / Entrar">
           <i class="fa-solid fa-circle-user"></i>
+          <span class="nav-profile-label">Perfil</span>
         </a>
       </nav>
+      <!-- ADIÇÃO: botão hamburger ausente nas páginas auth -->
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Abrir menu">
+        ☰
+      </button>
     </header>
 
     <!-- ── AUTH LAYOUT ── -->
@@ -750,7 +842,7 @@
                 <input
                   type="password"
                   id="password"
-                  class="form-input"
+                  class="form-input has-toggle"
                   placeholder="Mínimo 8 caracteres"
                   required
                   oninput="checkStrength(this.value)"
@@ -1022,6 +1114,11 @@
     </div>
 
     <script>
+      /* ADIÇÃO: função ausente — sem ela o hamburger quebrava com erro de referência */
+      function toggleMenu() {
+        document.getElementById("menu").classList.toggle("active");
+      }
+
       function togglePw(id, btn) {
         const input = document.getElementById(id);
         const icon = btn.querySelector("i");
@@ -1082,35 +1179,31 @@
           );
         }, 1500);
       }
+
       document.addEventListener("DOMContentLoaded", () => {
         const container = document.getElementById("transition-container");
         const links = document.querySelectorAll(
-          'a[href*="login.html"], a[href*="register.html"]',
+          'a[href*="login.html"], a[href*="register.html"], a[href*="forgot-password.html"]',
         );
 
         links.forEach((link) => {
           link.addEventListener("click", (e) => {
-            // Impede o salto imediato
             e.preventDefault();
             const destination = link.href;
-
-            // Ativa a animação em cascata
             container.classList.add("active");
-
-            // Espera o tempo das camadas (0.6s + 0.2s de delay) para mudar de página
             setTimeout(() => {
               window.location.href = destination;
-            }, 800);
+            }, 650);
           });
         });
       });
     </script>
+
+    <!-- CORREÇÃO: movido para dentro do </body>. 5 layers reduzidas para 3. -->
+    <div class="multi-layer-transition" id="transition-container">
+      <div class="layer layer-1"></div>
+      <div class="layer layer-2"></div>
+      <div class="layer layer-3"></div>
+    </div>
   </body>
-  <div class="multi-layer-transition" id="transition-container">
-    <div class="layer layer-1"></div>
-    <div class="layer layer-2"></div>
-    <div class="layer layer-3"></div>
-    <div class="layer layer-4"></div>
-    <div class="layer layer-5"></div>
-  </div>
 </html>
