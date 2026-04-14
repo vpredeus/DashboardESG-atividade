@@ -9,8 +9,8 @@ export class AuthController {
 
 	@Post('register')
 	register(@Body() body: RegisterDto) {
-		const { nome, sobrenome, email, senha } = body;
-		return this.authService.signUp(nome, sobrenome, email, senha);
+		const { nome, sobrenome, email, senha, tipo, codigoEmpresa } = body;
+		return this.authService.signUp(nome, sobrenome, email, senha, tipo, codigoEmpresa);
 	}
 
 	@Post('login')

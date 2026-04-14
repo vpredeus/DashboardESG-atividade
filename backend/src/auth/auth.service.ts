@@ -3,22 +3,48 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { TipoCadastro } from './dto/register.dto';
 
 const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService) {}
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly jwtService: JwtService,
+        private readonly configService: ConfigService,
+    ) {}
 
     async signUp(
         nome: string,
         sobrenome: string,
         email: string,
         senha: string,
+        tipo: TipoCadastro = 'usuario',
+        codigoEmpresa?: string,
     ) {
         const existingUser = await this.usersService.findByEmail(email);
         if (existingUser) {
             throw new BadRequestException('Email em uso');
+        }
+
+        let role: 'user' | 'admin' = 'user';
+
+        if (tipo === 'empresa') {
+            const empresaAccessCode =
+                this.configService.get<string>('EMPRESA_ACCESS_CODE') ??
+                this.configService.get<string>('EMPRESA_REGISTRATION_CODE');
+
+            if (!empresaAccessCode) {
+                throw new BadRequestException('Cadastro empresarial indisponivel no momento');
+            }
+
+            if (!codigoEmpresa || codigoEmpresa !== empresaAccessCode) {
+                throw new BadRequestException('Codigo de empresa invalido');
+            }
+
+            role = 'admin';
         }
 
         const salt = randomBytes(8).toString('hex');
@@ -30,6 +56,7 @@ export class AuthService {
             sobrenome,
             email,
             senha: senhaHash,
+            role,
         });
 
         return {

@@ -6,6 +6,7 @@ type CreateUserInput = {
 	sobrenome: string;
 	email: string;
 	senha: string;
+	role?: string;
 };
 
 @Injectable()
@@ -38,6 +39,7 @@ export class UsersService {
 				sobrenome: data.sobrenome.trim(),
 				email: data.email.toLowerCase().trim(),
 				senha: data.senha,
+				role: data.role ?? 'user',
 			},
 			select: {
 				id: true,

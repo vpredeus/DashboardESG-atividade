@@ -1,4 +1,14 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+	IsEmail,
+	IsIn,
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	MinLength,
+	ValidateIf,
+} from 'class-validator';
+
+export type TipoCadastro = 'usuario' | 'empresa';
 
 export class RegisterDto {
 	@IsString()
@@ -15,4 +25,13 @@ export class RegisterDto {
 	@IsString()
 	@MinLength(6)
 	senha: string;
+
+	@IsOptional()
+	@IsIn(['usuario', 'empresa'])
+	tipo?: TipoCadastro;
+
+	@ValidateIf((o: RegisterDto) => o.tipo === 'empresa')
+	@IsString()
+	@IsNotEmpty()
+	codigoEmpresa?: string;
 }
