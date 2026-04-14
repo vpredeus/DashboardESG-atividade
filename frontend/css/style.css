@@ -4870,3 +4870,306 @@ svg {
 .impacto-cat-badge {
   text-transform: none !important; /* desativa uppercase para labels com capitalize no JS */
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MODAL DE SELEÇÃO DE TIPO DE ACESSO — register.html
+   Exibido após validação do formulário de cadastro.
+   Overlay com loading animado ao fundo + card de escolha.
+══════════════════════════════════════════════════════════════ */
+
+/* Overlay escuro com backdrop-blur */
+.access-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(7, 10, 25, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.access-modal-overlay.show {
+  display: flex;
+  animation: amOverlayIn 0.3s ease both;
+}
+
+@keyframes amOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Ícone de loading flutuante ao fundo do overlay */
+.access-modal-bg-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.access-modal-bg-loader i {
+  font-size: 18vw;
+  color: rgba(255, 215, 0, 0.04);
+  animation: amHourglassSpin 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 60px rgba(255, 215, 0, 0.06));
+}
+
+@keyframes amHourglassSpin {
+  0%   { transform: rotate(0deg)   scale(1);    opacity: 0.5; }
+  45%  { transform: rotate(160deg) scale(1.06); opacity: 1;   }
+  50%  { transform: rotate(180deg) scale(1.06); opacity: 1;   }
+  95%  { transform: rotate(340deg) scale(1);    opacity: 0.5; }
+  100% { transform: rotate(360deg) scale(1);    opacity: 0.5; }
+}
+
+/* Card principal do modal */
+.access-modal-card {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(145deg, #0d1123 0%, #141c4a 100%);
+  border: 1px solid rgba(255, 215, 0, 0.18);
+  border-radius: 24px;
+  padding: 40px 36px 36px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.06),
+    0 32px 80px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: amCardIn 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+@keyframes amCardIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Cabeçalho do modal */
+.access-modal-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.access-modal-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--eniac-amarelo);
+  margin: 0 auto 18px;
+  box-shadow: 0 0 28px rgba(255, 215, 0, 0.1);
+}
+
+.access-modal-header h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+
+.access-modal-header p {
+  font-size: 0.87rem;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Grid dos dois cards de opção */
+.access-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* Card de opção de acesso */
+.access-option-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 22px 16px 20px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.access-option-card:hover {
+  background: rgba(255, 215, 0, 0.05);
+  border-color: rgba(255, 215, 0, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(255, 215, 0, 0.1);
+}
+
+.access-option-card.selected {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.12);
+}
+
+/* Ícone dentro do card de opção */
+.access-option-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.access-option-icon.empresa {
+  background: rgba(255, 215, 0, 0.12);
+  color: var(--eniac-amarelo);
+  border: 1px solid rgba(255, 215, 0, 0.22);
+}
+
+.access-option-icon.usuario {
+  background: rgba(46, 204, 113, 0.12);
+  color: var(--verde-esg);
+  border: 1px solid rgba(46, 204, 113, 0.22);
+}
+
+/* Textos do card de opção */
+.access-option-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 2px;
+}
+
+.access-option-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.access-option-desc {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.5;
+}
+
+/* ── Painel de senha admin (step 2) ── */
+.access-admin-panel {
+  display: none;
+  margin-top: 4px;
+  animation: amCardIn 0.3s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+.access-admin-panel.show {
+  display: block;
+}
+
+.access-admin-hint {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.38);
+  text-align: center;
+  margin-bottom: 14px;
+  line-height: 1.55;
+}
+
+.access-admin-hint strong {
+  color: var(--eniac-amarelo);
+  font-weight: 700;
+}
+
+/* Botão de confirmar / continuar */
+.access-confirm-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--eniac-amarelo);
+  border: none;
+  border-radius: 12px;
+  color: var(--eniac-azul-deep);
+  font-family: "Sora", sans-serif;
+  font-size: 0.97rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 18px rgba(255, 215, 0, 0.22);
+  margin-top: 4px;
+}
+
+.access-confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(255, 215, 0, 0.38);
+  background: var(--eniac-amarelo-soft);
+}
+
+.access-confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botão de voltar ao step 1 (dentro do painel admin) */
+.access-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: "Sora", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 16px;
+  transition: color 0.2s;
+}
+
+.access-back-btn:hover { color: rgba(255, 255, 255, 0.7); }
+.access-back-btn i { font-size: 0.72rem; }
+
+/* Mensagem de erro de senha admin */
+.access-admin-error {
+  display: none;
+  font-size: 0.8rem;
+  color: #e74c3c;
+  text-align: center;
+  margin-top: 10px;
+  animation: amShakeX 0.35s ease;
+}
+
+.access-admin-error.show { display: block; }
+
+@keyframes amShakeX {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+/* Rodapé do modal */
+.access-modal-footer {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.22);
+  line-height: 1.5;
+}
