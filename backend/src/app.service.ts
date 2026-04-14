@@ -57,7 +57,7 @@ export class AppService {
       // ── Camada 1: verifica por postado (campo único no schema) ──────────────
       if (postadoDate) {
         const existePorPostado = await this.prisma.desafios
-          .findUnique({ where: { postado: postadoDate } })
+          .findFirst({ where: { postado: postadoDate } })
           .catch(() => null);
 
         if (existePorPostado) {

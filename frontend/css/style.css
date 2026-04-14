@@ -80,6 +80,11 @@ header {
   border-bottom: 1px solid rgba(255, 215, 0, 0.2);
 }
 
+header a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .logo {
   font-size: 18px;
   font-weight: 800;
@@ -199,6 +204,856 @@ body {
   font-size: 26px;
   cursor: pointer;
   color: var(--eniac-amarelo);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   AUTH PAGES — login, register, forgot-password
+   CSS migrado do inline para cá para eliminar repetição nos 3 arquivos.
+══════════════════════════════════════════════════════════════ */
+
+/* Fundo dark exclusivo das páginas de autenticação */
+body.auth-body {
+  background: var(--bg-dark);
+  color: var(--branco);
+  min-height: 100vh;
+}
+
+/* Layout duas colunas */
+.auth-page {
+  min-height: calc(100vh - 70px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Lado visual */
+.auth-visual {
+  background: linear-gradient(
+    135deg,
+    var(--eniac-azul-deep) 0%,
+    var(--eniac-azul) 60%,
+    #2d3d9e 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-visual-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 215, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 215, 0, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.auth-visual-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 380px;
+}
+
+.auth-visual-tag {
+  display: inline-block;
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--eniac-amarelo);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 5px 16px;
+  border-radius: 50px;
+  margin-bottom: 28px;
+}
+
+.auth-visual-title {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 16px;
+  letter-spacing: -0.3px;
+}
+
+.auth-visual-title em {
+  font-style: normal;
+  color: var(--eniac-amarelo);
+}
+
+.auth-visual-desc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.7;
+  margin-bottom: 48px;
+}
+
+/* Heptagon */
+.hept-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.hept-svg-wrap {
+  width: 100%;
+  height: 100%;
+  animation: heptSpin 12s linear infinite;
+}
+
+.hept-svg-wrap-2 {
+  position: absolute;
+  width: 62%;
+  height: 62%;
+  top: 19%;
+  left: 19%;
+  animation: heptSpin 8s linear infinite reverse;
+}
+
+.hept-svg-wrap-3 {
+  position: absolute;
+  width: 34%;
+  height: 34%;
+  top: 33%;
+  left: 33%;
+  animation: heptSpin 5s linear infinite reverse;
+}
+
+@keyframes heptSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hept-glow {
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  top: 15%;
+  left: 15%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.18) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: heptPulse 3s ease-in-out infinite;
+}
+
+@keyframes heptPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.hept-center-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  font-family: "Space Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--eniac-amarelo);
+  letter-spacing: 2px;
+  text-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+}
+
+/* Benefits (register) */
+.auth-benefits {
+  text-align: left;
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.benefit-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 215, 0, 0.12);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--eniac-amarelo);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Lado formulário */
+.auth-form-side {
+  background: var(--bg-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 48px;
+  position: relative;
+}
+
+.auth-form-side::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 215, 0, 0.2),
+    transparent
+  );
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+.auth-card-header {
+  margin-bottom: 28px;
+}
+
+.auth-card-header h2 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin-bottom: 8px;
+}
+
+.auth-card-header p {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.auth-card-header p a {
+  color: var(--eniac-amarelo);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+.auth-card-header p a:hover {
+  opacity: 0.75;
+}
+
+/* Social buttons */
+.social-auth {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  padding: 11px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.75);
+  font-family: "Sora", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.social-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+.social-btn .social-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.social-btn .social-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.auth-divider span {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Form fields */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.48);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   INPUT WRAP — animação de preenchimento (fill) ao focar/digitar
+   Inspirada no efeito overlay do exemplo Bedimcode, adaptada ao
+   sistema de cores ENIAC ESG (fundo dark, amarelo dourado, azul).
+
+   COMO FUNCIONA:
+   1. O ::before do .input-wrap é um overlay amarelo-dourado semi-
+      transparente que começa com largura 0 (à esquerda) e expande
+      para 100% quando o campo ganha foco ou tem conteúdo (.has-value).
+   2. Todos os elementos internos ficam acima do overlay via z-index.
+   3. O ícone de cadeado muda de cor ao focar (cinza → amarelo).
+   4. A borda e box-shadow do input acompanham o mesmo gatilho.
+   5. O toggle de senha herda o z-index correto para ficar clicável.
+══════════════════════════════════════════════════════════════════ */
+
+.input-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden; /* contém o overlay dentro do arredondamento */
+}
+
+/* ── Overlay de preenchimento ─────────────────────────────────────
+   Cresce da esquerda para a direita ao focar ou ter conteúdo.
+   Usa o mesmo ::before do wrapper para não criar elemento extra. */
+.input-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.1) 0%,
+    rgba(255, 215, 0, 0.04) 100%
+  );
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Dispara quando o input está focado OU tem valor (.has-value) */
+.input-wrap:focus-within::before,
+.input-wrap.has-value::before {
+  width: 100%;
+}
+
+/* ── Ícone de campo (cadeado, envelope, etc.) ─────────────────── */
+.input-wrap > i,
+.input-wrap i.field-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.28);
+  font-size: 0.9rem;
+  pointer-events: none;
+  transition:
+    color 0.35s ease,
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1; /* acima do overlay */
+}
+
+/* Ícone animado: fica dourado e dá um leve "salto" ao focar */
+.input-wrap:focus-within > i,
+.input-wrap:focus-within i.field-icon,
+.input-wrap.has-value > i,
+.input-wrap.has-value i.field-icon {
+  color: var(--eniac-amarelo);
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* ── Input em si ──────────────────────────────────────────────── */
+.form-input {
+  width: 100%;
+  padding: 13px 16px 13px 42px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-family: "Sora", sans-serif;
+  font-size: 0.92rem;
+  outline: none;
+  position: relative;
+  z-index: 1; /* acima do overlay */
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    background 0.35s ease;
+}
+
+.form-input.has-toggle {
+  padding-right: 44px;
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.18);
+  transition: color 0.3s ease;
+}
+
+/* Ao focar: borda dourada + glow suave */
+.form-input:focus {
+  border-color: rgba(255, 215, 0, 0.55);
+  background: transparent; /* overlay do ::before assume a cor */
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+/* Campo com valor digitado mas sem foco: mantém borda levemente ativa */
+.input-wrap.has-value .form-input:not(:focus) {
+  border-color: rgba(255, 215, 0, 0.28);
+}
+
+/* ── Toggle de senha (olho) ───────────────────────────────────── */
+.toggle-pw {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 6px;
+  transition:
+    color 0.25s ease,
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2; /* acima do overlay e do input */
+}
+
+.toggle-pw:hover {
+  color: var(--eniac-amarelo);
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* Password strength bar */
+.pw-strength {
+  margin-top: 8px;
+  display: none;
+}
+.pw-strength-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+.pw-strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  width: 0%;
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
+}
+.pw-strength-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Checkbox row */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.checkbox-wrap input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--eniac-amarelo);
+  cursor: pointer;
+}
+.checkbox-wrap span {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+.forgot-link {
+  font-size: 0.83rem;
+  color: var(--eniac-amarelo);
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.forgot-link:hover {
+  opacity: 1;
+}
+
+/* Terms (register) */
+.terms-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  margin-top: 4px;
+}
+.terms-wrap input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--eniac-amarelo);
+  cursor: pointer;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.terms-wrap span {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.5;
+}
+.terms-wrap a {
+  color: var(--eniac-amarelo);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Submit */
+.btn-auth-submit {
+  width: 100%;
+  padding: 15px 24px;
+  background: var(--eniac-amarelo);
+  border: none;
+  border-radius: 12px;
+  color: var(--eniac-azul-deep);
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.25);
+  margin-top: 4px;
+}
+
+.btn-auth-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(255, 215, 0, 0.4);
+  background: var(--eniac-amarelo-soft);
+}
+.btn-auth-submit:active {
+  transform: translateY(0);
+}
+.btn-auth-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Forgot password */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 32px;
+  transition: color 0.2s;
+}
+.back-link:hover {
+  color: var(--eniac-amarelo);
+}
+.back-link i {
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+}
+.back-link:hover i {
+  transform: translateX(-3px);
+}
+
+.auth-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--eniac-amarelo);
+  margin-bottom: 20px;
+}
+
+.steps-indicator {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.25);
+}
+.step.active {
+  color: var(--eniac-amarelo);
+}
+.step.done {
+  color: var(--verde-esg);
+}
+.step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+.step.active .step-num {
+  background: rgba(255, 215, 0, 0.15);
+}
+.step.done .step-num {
+  background: rgba(46, 204, 113, 0.15);
+}
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 8px;
+}
+
+.field-hint {
+  margin-top: 7px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.32);
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.field-hint i {
+  color: rgba(255, 215, 0, 0.45);
+  font-size: 0.72rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.success-state {
+  display: none;
+  text-align: center;
+  padding: 8px 0;
+  animation: fadeInUp 0.4s ease both;
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.success-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(46, 204, 113, 0.12);
+  border: 1.5px solid rgba(46, 204, 113, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--verde-esg);
+  margin: 0 auto 24px;
+}
+.success-state h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+.success-state p {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+.success-state p strong {
+  color: var(--eniac-amarelo);
+  font-weight: 700;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Sora", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.resend-wrap {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.32);
+}
+.resend-link {
+  color: var(--eniac-amarelo);
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.8;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.resend-link:hover {
+  opacity: 1;
+}
+.divider-small {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 24px 0;
+}
+.alt-action {
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.32);
+  margin-top: 20px;
+}
+.alt-action a {
+  color: var(--eniac-amarelo);
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.alt-action a:hover {
+  opacity: 1;
+}
+
+/* Responsive auth ≤860px */
+@media (max-width: 860px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+  .auth-form-side {
+    order: 1;
+    padding: 40px 24px;
+  }
+  .auth-form-side::after {
+    display: none;
+  }
+  .auth-visual {
+    order: 2;
+    min-height: 300px;
+    padding: 40px 24px;
+  }
+  .hept-container {
+    width: 150px;
+    height: 150px;
+  }
+  .auth-benefits {
+    display: none;
+  }
+  .auth-visual-title {
+    font-size: 1.7rem;
+  }
+}
+
+/* Responsive auth ≤480px */
+@media (max-width: 480px) {
+  .auth-visual {
+    min-height: 220px;
+  }
+  .auth-form-side {
+    padding: 28px 16px;
+  }
+  .auth-card-header h2 {
+    font-size: 1.55rem;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .social-auth {
+    flex-direction: column;
+  }
 }
 
 /* ── HERO ──────────────────────────────────── */
@@ -1173,6 +2028,20 @@ body {
   padding: 20px 5%;
 }
 
+/* ── Header hide-on-scroll ──────────────────────────────────
+   A classe .header-hidden é adicionada via JS ao rolar para baixo
+   e removida ao rolar para cima. Transição suave de translate. */
+header {
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease;
+}
+
+header.header-hidden {
+  transform: translateY(-100%);
+}
+
+/* ── Dashboard responsivo ────────────────────────────────── */
 .dash-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2446,10 +3315,27 @@ input[type="file"] {
   .upload-wrapper {
     padding: 20px;
   }
-  /* Gráficos em mobile */
+  /* Gráficos em mobile — dash-row vira coluna única */
+  .dash-row {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
   .chart-canvas-wrap {
     height: 220px !important;
     min-height: 160px;
+  }
+
+  .dark-chart {
+    padding: 16px;
+  }
+
+  .chart-header {
+    margin-bottom: 12px;
+  }
+
+  .kpi-row {
+    gap: 10px;
   }
   .impactos-main {
     padding: 24px 4%;
@@ -3606,4 +4492,381 @@ input[type="file"] {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RESPONSIVIDADE — REFATORAÇÃO MOBILE-FIRST
+   Adicionado como bloco consolidado para sobrescrever conflitos.
+   Abordagem: clamp() para tipografia, grids fluidos, sem overflow.
+══════════════════════════════════════════════════════════════════ */
+
+/* ── Tipografia responsiva com clamp() ── */
+.hero-title {
+  font-size: clamp(1.8rem, 5vw, 3.6rem);
+}
+
+.hero-subtitle {
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+}
+
+.section-label h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.info-text h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.projeto-titulo {
+  font-size: clamp(1.1rem, 3vw, 1.7rem);
+}
+
+.impacto-titulo {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+}
+
+.kpi-num,
+.kpi-val {
+  font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+}
+
+.stat-num {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+/* ── Prevenção de overflow horizontal global ── */
+img,
+canvas,
+table,
+iframe,
+video,
+svg {
+  max-width: 100%;
+}
+
+/* ── Header hide-on-scroll: funciona em TODOS os dispositivos ──
+   Comportamento idêntico em mobile, tablet e desktop.
+   A transição suave já está declarada no bloco header principal. */
+
+/* ── AOS desabilitado em mobile — evita conteúdo invisível
+   em dispositivos lentos ── */
+@media (max-width: 768px) {
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Impacto grid: coluna única em mobile ── */
+@media (max-width: 600px) {
+  #impactos-lista {
+    grid-template-columns: 1fr !important;
+    padding: 0 12px 24px !important;
+    gap: 14px !important;
+  }
+  /* Cards de impacto: reduz padding em telas pequenas */
+  .impacto-grid-card {
+    padding: 16px 14px 14px !important;
+  }
+  /* Números de impacto menores em mobile */
+  .impacto-num-row {
+    gap: 14px !important;
+  }
+}
+
+/* ── Projetos: stack completo em mobile ── */
+@media (max-width: 600px) {
+  .projeto-corpo {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 18px 16px 22px;
+  }
+  .projeto-topo {
+    padding: 18px 16px 16px;
+  }
+  .projeto-rodape {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+  .projeto-meta {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .projeto-impacto-num {
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+  }
+}
+
+/* ── Cards de flip (projetos) ── */
+@media (max-width: 480px) {
+  .card {
+    min-height: 240px;
+  }
+  .cards {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+}
+
+/* ── Gráficos: garantir que não estourem ── */
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .chart-canvas-wrap {
+    height: 200px !important;
+    min-height: 160px;
+  }
+  .dash-row {
+    gap: 14px;
+  }
+  .dark-chart {
+    padding: 14px 12px;
+  }
+  .chart-header {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  /* Tabelas: scroll horizontal em vez de overflow ── */
+  .csv-table-wrap,
+  table {
+    overflow-x: auto;
+    display: block;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Auth pages: ajuste de padding em telas muito pequenas ── */
+@media (max-width: 380px) {
+  .auth-form-side {
+    padding: 20px 12px;
+  }
+  .auth-card-header h2 {
+    font-size: 1.3rem;
+  }
+  .steps-indicator {
+    gap: 4px;
+  }
+  .step span {
+    display: none; /* oculta labels de texto dos steps */
+  }
+}
+
+/* ── Hero: padding ajustado em mobile ── */
+@media (max-width: 480px) {
+  .hero {
+    padding: 48px 5% 40px;
+    min-height: auto;
+  }
+  .hero-stats {
+    gap: 10px;
+  }
+  .stat {
+    flex: 1 1 calc(50% - 5px);
+  }
+  .stat-divider {
+    display: none;
+  }
+}
+
+/* ── Filtros e área-filtros: scroll horizontal em mobile ── */
+@media (max-width: 600px) {
+  .filter-bar {
+    padding: 20px 12px 0;
+    gap: 8px;
+  }
+  .filter-btn {
+    font-size: 13px;
+    padding: 7px 16px;
+  }
+  .area-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+  .area-filters::-webkit-scrollbar {
+    display: none;
+  }
+  .area-filter-btn {
+    flex-shrink: 0;
+  }
+  .area-img-wrap {
+    width: 80px;
+    height: 60px;
+  }
+}
+
+/* ── Seção sobre: coluna em mobile ── */
+@media (max-width: 480px) {
+  .sobre-projeto {
+    padding: 24px 16px;
+  }
+  .sobre-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sobre-grid {
+    gap: 28px;
+  }
+}
+
+/* ── Footer: links em coluna em mobile ── */
+@media (max-width: 480px) {
+  .footer-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .footer-inner {
+    padding: 0;
+  }
+}
+
+/* ── Paginação responsiva ── */
+@media (max-width: 480px) {
+  #paginacao-top,
+  #paginacao-bottom {
+    padding: 12px 12px;
+    gap: 6px;
+  }
+  .pag-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ── Upload inline: padding fluido em mobile ── */
+@media (max-width: 600px) {
+  .upload-inline-section {
+    padding: 28px 16px 40px;
+  }
+  .upload-wrapper {
+    padding: 16px;
+  }
+  .drop-zone {
+    padding: 28px 16px;
+  }
+  .upload-cta {
+    flex-wrap: wrap;
+  }
+  .btn-gerar {
+    width: 100%;
+    justify-content: center;
+  }
+  .novo-csv-banner {
+    padding: 0 12px;
+  }
+}
+
+/* ── KPI row: 2 colunas em mobile pequeno ── */
+@media (max-width: 400px) {
+  .kpi-card {
+    flex: 1 1 calc(50% - 8px);
+    max-width: none;
+    min-width: 0;
+    padding: 12px 8px;
+  }
+  .kpi-num,
+  .kpi-val {
+    font-size: 1.2rem;
+  }
+  .kpi-label {
+    font-size: 9px;
+  }
+}
+
+/* ── Acessibilidade: targets mínimos de 38X38px ── */
+.filter-btn,
+.pag-btn,
+.export-btn,
+.nav-profile-btn,
+.menu-btn,
+.fp-remove,
+.btn-gerar,
+.btn-auth-submit,
+.popup-got-it {
+  min-height: 38px;
+}
+
+@media (max-width: 768px) {
+  nav a,
+  .nav-profile-btn {
+    min-height: 44px;
+  }
+}
+
+/* ── Contraste: garantir legibilidade ── */
+.pc-resumo,
+.impacto-texto p,
+.hero-subtitle {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ── Scatter plot: wrapper responsivo ── */
+#graficoScatter-wrap {
+  position: relative;
+  width: 100%;
+  height: 320px;
+}
+
+@media (max-width: 768px) {
+  #graficoScatter-wrap {
+    height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  #graficoScatter-wrap {
+    height: 220px;
+  }
+}
+
+/* ── Legenda do scatter ── */
+.scatter-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.scatter-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 600;
+}
+
+.scatter-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Texto capitalizado nas áreas/eixos/tipos de impacto ── */
+.capitalize-first {
+  text-transform: capitalize;
+}
+
+/* Forçar capitalização nos chips de área e eixo dos cards ── */
+.area-chip,
+.pc-eixo,
+.impacto-cat-badge {
+  text-transform: none !important; /* desativa uppercase para labels com capitalize no JS */
 }

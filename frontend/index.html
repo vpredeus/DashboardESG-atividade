@@ -246,10 +246,12 @@
   <body>
     <!-- ── HEADER ── -->
     <header>
-      <div class="logo">
-        <span class="logo-mark">⬡</span>
-        ENIAC <span class="logo-accent">ESG HUB</span>
-      </div>
+      <a href="../index.html" class="">
+        <div class="logo">
+          <span class="logo-mark">⬡</span>
+          ENIAC <span class="logo-accent">ESG HUB</span>
+        </div>
+      </a>
       <nav id="menu">
         <a href="index.html" class="active">Projetos &amp; Dashboard</a>
         <a href="./html/impactos.html">Impactos e Valores</a>
@@ -627,26 +629,37 @@
           </div>
         </div>
 
+        <!-- ── Scatter Plot: Impacto Direto × Indireto por Projeto ── -->
         <div style="margin-top: 24px">
           <div class="chart-box dark-chart">
             <div class="chart-header">
-              <span class="chart-title">Pontos de Impacto por Projeto</span>
-              <span class="chart-badge">Barras</span>
+              <span class="chart-title">Dispersão de Impacto por Projeto</span>
+              <span class="chart-badge">Dispersão</span>
             </div>
+            <p
+              style="
+                font-size: 0.8rem;
+                color: rgba(255, 255, 255, 0.4);
+                margin: 0 0 16px;
+                line-height: 1.5;
+              "
+            >
+              Cada ponto representa um projeto. O eixo X mostra o impacto social
+              direto (pessoas atingidas diretamente) e o eixo Y o impacto
+              indireto (alcance secundário). A cor indica o eixo de atuação.
+            </p>
             <div
-              class="chart-canvas-wrap"
-              style="height: 280px"
+              id="graficoScatter-wrap"
               data-aos="fade-up"
               data-aos-duration="550"
               data-aos-delay="60"
             >
-              <canvas id="graficoImpacto"></canvas>
+              <canvas id="graficoScatter"></canvas>
             </div>
+            <!-- Legenda dinâmica por eixo -->
+            <div id="scatter-legend" class="scatter-legend"></div>
             <div class="chart-footer">
-              <button
-                class="export-btn"
-                onclick="exportCSV('graficoImpacto', 'impacto_projetos')"
-              >
+              <button class="export-btn" onclick="exportScatterCSV()">
                 ⬇ Exportar CSV
               </button>
             </div>
@@ -723,6 +736,44 @@
         delay: 0,
       });
     </script>
+
+    <script>
+      /* ── Header hide-on-scroll ─────────────────────────────────────
+         Esconde o header ao rolar para baixo (após 60px) e o traz de
+         volta ao rolar para cima. A classe .header-hidden no style.css
+         aplica transform: translateY(-100%) com transição suave.
+         Delay de 150ms antes de esconder evita flashes em micro-scrolls. */
+      (function () {
+        const header = document.querySelector("header");
+        let lastY = window.scrollY;
+        let hideTimer = null;
+
+        window.addEventListener(
+          "scroll",
+          () => {
+            const currentY = window.scrollY;
+            const delta = currentY - lastY;
+
+            // Rolou para cima → mostrar imediatamente
+            if (delta < 0) {
+              clearTimeout(hideTimer);
+              header.classList.remove("header-hidden");
+            }
+            // Rolou para baixo e já passou dos primeiros 60px → esconder com delay
+            else if (delta > 0 && currentY > 60) {
+              clearTimeout(hideTimer);
+              hideTimer = setTimeout(() => {
+                header.classList.add("header-hidden");
+              }, 150);
+            }
+
+            lastY = currentY;
+          },
+          { passive: true },
+        );
+      })();
+    </script>
+
     <script src="./js/script.js"></script>
   </body>
 </html>

@@ -52,6 +52,17 @@ function eixoColor(eixo, idx) {
   return EIXO_COLORS[key] || CHART_COLORS[idx % CHART_COLORS.length];
 }
 
+// ── Capitaliza a primeira letra de cada palavra de um label ──────
+// Ex: "meio ambiente" → "Meio Ambiente", "educação" → "Educação"
+function _capitalizarLabel(str) {
+  if (!str) return str;
+  return String(str)
+    .trim()
+    .split(/\s+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
 // ── Utilitários ───────────────────────────────────────────────────
 function toggleMenu() {
   document.getElementById("menu").classList.toggle("active");
@@ -1257,10 +1268,10 @@ function renderIndex(projetos) {
     },
   ]);
 
-  // Pizza por eixo
+  // Pizza por eixo — com capitalização correta
   const eixoMap = {};
   projetos.forEach((p) => {
-    const e = p.eixo || "Não informado";
+    const e = _capitalizarLabel(p.eixo || "Não Informado");
     eixoMap[e] = (eixoMap[e] || 0) + 1;
   });
   const eixoLabels = Object.keys(eixoMap);
@@ -1271,10 +1282,10 @@ function renderIndex(projetos) {
     eixoLabels.map((e, i) => eixoColor(e, i)),
   );
 
-  // Radar por área primária
+  // Radar por área primária — com capitalização correta
   const areaMap = {};
   projetos.forEach((p) => {
-    const a = p.areaPrimaria || "Sem área";
+    const a = _capitalizarLabel(p.areaPrimaria || "Sem Área");
     areaMap[a] = (areaMap[a] || 0) + 1;
   });
   const areaLabels = Object.keys(areaMap);
@@ -1285,22 +1296,140 @@ function renderIndex(projetos) {
     "Projetos",
   );
 
-  // Barras impacto direto por projeto
-  makeBar(
-    "graficoImpacto",
-    projetos.map((p) => p.titulo || p.empresa || "Projeto"),
-    [
-      {
-        label: "Impacto Social Direto",
-        data: projetos.map((p) => p.impactoSocialDireto),
-        backgroundColor: projetos.map(
-          (_, i) => CHART_COLORS[i % CHART_COLORS.length],
-        ),
-        borderRadius: 6,
-        borderSkipped: false,
+  // ── Scatter Plot: Impacto Direto × Indireto por projeto ──────────
+  _renderScatterPlot(projetos);
+}
+
+/**
+ * Renderiza o gráfico de dispersão no canvas #graficoScatter.
+ * Eixo X = Impacto Social Direto
+ * Eixo Y = Impacto Social Indireto
+ * Cor = eixo de atuação do projeto
+ * Tooltip = título do projeto + valores
+ */
+function _renderScatterPlot(projetos) {
+  const canvas = document.getElementById("graficoScatter");
+  if (!canvas) return;
+
+  // Agrupa projetos por eixo para criar um dataset por cor
+  const eixoGroups = {};
+  projetos.forEach((p) => {
+    const eixo = _capitalizarLabel(p.eixo || "Não informado");
+    if (!eixoGroups[eixo]) eixoGroups[eixo] = [];
+    eixoGroups[eixo].push({
+      x: p.impactoSocialDireto || 0,
+      y: p.impactoSocialIndireto || 0,
+      titulo: p.titulo || p.empresa || "Projeto",
+      eixo: eixo,
+    });
+  });
+
+  const eixoLabels = Object.keys(eixoGroups);
+  const datasets = eixoLabels.map((eixo, idx) => {
+    const cor = eixoColor(eixo.toLowerCase(), idx);
+    return {
+      label: eixo,
+      data: eixoGroups[eixo],
+      backgroundColor: cor + "bb",
+      borderColor: cor,
+      borderWidth: 1.5,
+      pointRadius: 7,
+      pointHoverRadius: 10,
+      pointHoverBorderWidth: 2,
+    };
+  });
+
+  // Destroy instância anterior se existir
+  _destroyIfExists("graficoScatter");
+
+  new Chart(canvas, {
+    type: "scatter",
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }, // legenda customizada abaixo
+        tooltip: {
+          ...DARK.tooltip,
+          callbacks: {
+            title: (items) => {
+              const raw = items[0].raw;
+              // Trunca título longo
+              const t = raw.titulo || "";
+              return t.length > 40 ? t.substring(0, 40) + "…" : t;
+            },
+            label: (ctx) => {
+              const r = ctx.raw;
+              return [
+                ` Eixo: ${r.eixo}`,
+                ` Direto: ${numFmt(r.x)} pessoas`,
+                ` Indireto: ${numFmt(r.y)} pessoas`,
+              ];
+            },
+          },
+        },
       },
-    ],
-  );
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Impacto Social Direto (pessoas)",
+            color: DARK.text,
+            font: { size: 11, weight: "600" },
+          },
+          ticks: { color: DARK.text, maxTicksLimit: 6 },
+          grid: { color: DARK.grid },
+          beginAtZero: true,
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Impacto Social Indireto (pessoas)",
+            color: DARK.text,
+            font: { size: 11, weight: "600" },
+          },
+          ticks: { color: DARK.text, maxTicksLimit: 6 },
+          grid: { color: DARK.grid },
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+
+  // Legenda customizada abaixo do gráfico
+  const legendEl = document.getElementById("scatter-legend");
+  if (legendEl) {
+    legendEl.innerHTML = eixoLabels
+      .map((eixo, idx) => {
+        const cor = eixoColor(eixo.toLowerCase(), idx);
+        return `<div class="scatter-legend-item">
+          <span class="scatter-legend-dot" style="background:${cor}"></span>
+          <span>${eixo}</span>
+        </div>`;
+      })
+      .join("");
+  }
+}
+
+/**
+ * Exporta os dados do scatter plot para CSV.
+ */
+function exportScatterCSV() {
+  const chart = Chart.getChart("graficoScatter");
+  if (!chart) return;
+  const rows = [["Projeto", "Eixo", "Impacto Direto", "Impacto Indireto"]];
+  chart.data.datasets.forEach((ds) => {
+    ds.data.forEach((pt) => {
+      rows.push([pt.titulo, pt.eixo, pt.x, pt.y]);
+    });
+  });
+  const csv = rows.map((r) => r.map((v) => `"${v}"`).join(";")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `dispersao_impacto_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
 }
 
 // ── Cards de projeto movidos para impactos.html ─────────────────
@@ -1516,6 +1645,9 @@ function _buildImpactoCardGrid(p, idx) {
   const cor = eixoColor(p.eixo, idx);
   const odsArr = [p.ods1, p.ods2, p.ods3].filter(Boolean);
   const cardId = `imp-${idx}`;
+  // Capitaliza eixo e natureza para exibição
+  const eixoDisplay = _capitalizarLabel(p.eixo || "");
+  const naturezaDisplay = _capitalizarLabel(p.natureza || "");
 
   const div = document.createElement("div");
   div.className = "impacto-grid-card";
@@ -1558,8 +1690,8 @@ function _buildImpactoCardGrid(p, idx) {
     <div>
       ${p.empresa ? `<div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${cor};margin-bottom:5px">${p.empresa}</div>` : ""}
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-        ${p.eixo ? `<span style="padding:3px 10px;border-radius:50px;font-size:.68rem;font-weight:700;background:${cor}22;color:${cor};border:1px solid ${cor}44">${p.eixo}</span>` : ""}
-        ${p.natureza ? `<span style="padding:3px 10px;border-radius:50px;font-size:.68rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5)">${p.natureza}</span>` : ""}
+        ${eixoDisplay ? `<span style="padding:3px 10px;border-radius:50px;font-size:.68rem;font-weight:700;background:${cor}22;color:${cor};border:1px solid ${cor}44">${eixoDisplay}</span>` : ""}
+        ${naturezaDisplay ? `<span style="padding:3px 10px;border-radius:50px;font-size:.68rem;font-weight:600;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5)">${naturezaDisplay}</span>` : ""}
       </div>
       <h3 style="font-size:.95rem;font-weight:700;color:#fff;margin:0;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
         ${p.titulo || "Sem título"}
@@ -1724,9 +1856,10 @@ function _renderGraficosImpactos(projetos) {
   }
 
   // ── 1. Pizza — Impacto total por eixo ────────────────────────────
+  // Capitaliza primeira letra de cada palavra (ex: "meio ambiente" → "Meio Ambiente")
   const eixoMap = {};
   projetos.forEach((p) => {
-    const e = p.eixo || "Sem eixo";
+    const e = _capitalizarLabel(p.eixo || "Sem Eixo");
     eixoMap[e] =
       (eixoMap[e] || 0) +
       (p.impactoSocialDireto || 0) +
@@ -1878,9 +2011,10 @@ function _renderGraficosImpactos(projetos) {
   );
 
   // ── 4. Rosca — Natureza das iniciativas ──────────────────────────
+  // Capitaliza: "pública" → "Pública", "privada" → "Privada", etc.
   const natMap = {};
   projetos.forEach((p) => {
-    const n = (p.natureza || "Não informado").trim();
+    const n = _capitalizarLabel((p.natureza || "Não Informado").trim());
     natMap[n] = (natMap[n] || 0) + 1;
   });
   const natLabels = Object.keys(natMap);
@@ -1929,9 +2063,12 @@ function _renderGraficosImpactos(projetos) {
   );
 
   // ── 5. Radar — Projetos por área primária ─────────────────────────
+  // Capitaliza: "gestão" → "Gestão", "sustentabilidade" → "Sustentabilidade"
   const areaMap = {};
   projetos.forEach((p) => {
-    const a = (p.areaPrimaria || p.area_primaria || "Sem área").trim();
+    const a = _capitalizarLabel(
+      (p.areaPrimaria || p.area_primaria || "Sem Área").trim(),
+    );
     if (a) areaMap[a] = (areaMap[a] || 0) + 1;
   });
   const areaLabels = Object.keys(areaMap);
@@ -2082,4 +2219,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // impactos.html: busca dados do servidor
   if (document.getElementById("imp-loading")) carregarImpactos();
+
+  // ── Animação de preenchimento nos campos de senha/email ──────────
+  // Adiciona .has-value ao .input-wrap pai quando o campo tem conteúdo,
+  // mantendo o overlay amarelo expandido mesmo após o desfoco.
+  // Também gerencia o toggle show/hide da senha nas páginas auth.
+  _initInputFillAnimation();
 });
+
+// ══════════════════════════════════════════════════════════════════
+//  INPUT FILL ANIMATION
+//  Gerencia a classe .has-value no wrapper e o toggle de senha
+//  para as páginas login.html, register.html e forgot-password.html.
+// ══════════════════════════════════════════════════════════════════
+
+function _initInputFillAnimation() {
+  // ── 1. Classe .has-value: mantém overlay expandido se campo tem texto ──
+  // Seleciona todos os .form-input dentro de .input-wrap nas páginas auth
+  document.querySelectorAll(".input-wrap .form-input").forEach((input) => {
+    const wrap = input.closest(".input-wrap");
+    if (!wrap) return;
+
+    // Verifica estado inicial (ex: autofill do browser)
+    const _sync = () => {
+      wrap.classList.toggle("has-value", input.value.length > 0);
+    };
+
+    input.addEventListener("input", _sync);
+    input.addEventListener("change", _sync);
+    // Captura autofill do browser (Chrome dispara animationstart)
+    input.addEventListener("animationstart", (e) => {
+      if (e.animationName === "onAutoFillStart") _sync();
+    });
+
+    _sync(); // estado inicial
+  });
+
+  // ── 2. Toggle show/hide senha ─────────────────────────────────────
+  // Funciona com qualquer .toggle-pw dentro de .input-wrap que contenha
+  // um .form-input[type=password]. Não depende de IDs fixos.
+  document.querySelectorAll(".toggle-pw").forEach((btn) => {
+    const wrap = btn.closest(".input-wrap");
+    const input = wrap?.querySelector(".form-input");
+    if (!input) return;
+
+    btn.addEventListener("click", () => {
+      const isPassword = input.type === "password";
+
+      // Alterna tipo
+      input.type = isPassword ? "text" : "password";
+
+      // Troca ícone FontAwesome (fa-eye / fa-eye-slash)
+      const icon = btn.querySelector("i");
+      if (icon) {
+        icon.classList.toggle("fa-eye", isPassword);
+        icon.classList.toggle("fa-eye-slash", !isPassword);
+      }
+
+      // Feedback visual: cor dourada enquanto senha está visível
+      btn.style.color = isPassword ? "var(--eniac-amarelo)" : "";
+
+      // Devolve o foco ao input para manter o overlay ativo
+      input.focus();
+    });
+  });
+}
