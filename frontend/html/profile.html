@@ -6,7 +6,6 @@
     <title>ENIAC ESG – Meu Perfil</title>
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="icon" href="../images/esg_logo.png" type="image/png" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,16 +16,204 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-
     <style>
-      /* Fundo dark para a página de perfil */
       body {
         background: var(--bg-dark);
         color: var(--branco);
       }
+
+      /* ── Skeleton loader para os campos enquanto carrega ── */
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.05) 25%,
+          rgba(255, 255, 255, 0.1) 50%,
+          rgba(255, 255, 255, 0.05) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 8px;
+        color: transparent !important;
+        pointer-events: none;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ── Overlay de loading global (para ações assíncronas) ── */
+      .profile-loading-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(10, 14, 40, 0.75);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .profile-loading-overlay.show {
+        display: flex;
+      }
+      .profile-loading-overlay i {
+        font-size: 2rem;
+        color: #ffd700;
+        animation: spin 1s linear infinite;
+      }
+      .profile-loading-overlay span {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── Toast container (sileoToast) ── */
+      #sileoToastContainer {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 360px;
+      }
+      .sileo-toast {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #141c4a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 14px 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        animation: slideIn 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(120%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .sileo-toast.removing {
+        animation: slideOut 0.3s ease forwards;
+      }
+      @keyframes slideOut {
+        to {
+          transform: translateX(120%);
+          opacity: 0;
+        }
+      }
+      .sileo-toast.success {
+        border-color: rgba(46, 204, 113, 0.3);
+      }
+      .sileo-toast.error {
+        border-color: rgba(231, 76, 60, 0.3);
+      }
+      .sileo-toast.warning {
+        border-color: rgba(243, 156, 18, 0.3);
+      }
+      .sileo-toast.info {
+        border-color: rgba(52, 152, 219, 0.3);
+      }
+      .sileo-toast-icon-wrap {
+        font-size: 1.1rem;
+        padding-top: 1px;
+      }
+      .sileo-toast.success .sileo-toast-icon-wrap {
+        color: #2ecc71;
+      }
+      .sileo-toast.error .sileo-toast-icon-wrap {
+        color: #e74c3c;
+      }
+      .sileo-toast.warning .sileo-toast-icon-wrap {
+        color: #f39c12;
+      }
+      .sileo-toast.info .sileo-toast-icon-wrap {
+        color: #3498db;
+      }
+      .sileo-toast-body {
+        flex: 1;
+      }
+      .sileo-toast-title {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: #fff;
+      }
+      .sileo-toast-msg {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 3px;
+      }
+      .sileo-toast-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.85rem;
+        line-height: 1;
+      }
+      .sileo-toast-close:hover {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .sileo-toast-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: currentColor;
+        opacity: 0.4;
+        animation: shrink linear forwards;
+        width: 100%;
+      }
+      .sileo-toast.success .sileo-toast-progress {
+        color: #2ecc71;
+      }
+      .sileo-toast.error .sileo-toast-progress {
+        color: #e74c3c;
+      }
+      .sileo-toast.info .sileo-toast-progress {
+        color: #3498db;
+      }
+      .sileo-toast.warning .sileo-toast-progress {
+        color: #f39c12;
+      }
+      @keyframes shrink {
+        from {
+          width: 100%;
+        }
+        to {
+          width: 0;
+        }
+      }
     </style>
   </head>
   <body class="auth-body">
+    <!-- ── Loading overlay global ── -->
+    <div class="profile-loading-overlay" id="profileLoadingOverlay">
+      <i class="fa-solid fa-circle-notch"></i>
+      <span id="profileLoadingMsg">Carregando…</span>
+    </div>
+
+    <!-- ── Toast container ── -->
+    <div id="sileoToastContainer"></div>
+
     <!-- ── HEADER ── -->
     <header>
       <a class="logo" href="../index.html">
@@ -62,7 +249,6 @@
     <div class="profile-page">
       <!-- ════════════ SIDEBAR ════════════ -->
       <aside class="profile-sidebar">
-        <!-- Card avatar -->
         <div class="profile-avatar-card">
           <div class="profile-avatar-wrap">
             <div class="profile-avatar" id="profileAvatarDisplay">
@@ -83,31 +269,59 @@
               onchange="handleAvatarChange(event)"
             />
           </div>
-          <div class="profile-name" id="sidebarName">João Silva</div>
-          <div class="profile-role-badge admin" id="sidebarRole">
-            <i class="fa-solid fa-shield-halved"></i> Admin
+          <div
+            class="profile-name skeleton"
+            id="sidebarName"
+            style="min-width: 120px; height: 1.2em"
+          >
+            ​
           </div>
-          <div class="profile-email-small" id="sidebarEmail">
-            joao@eniac.edu.br
+          <div
+            class="profile-role-badge"
+            id="sidebarRole"
+            style="min-width: 60px; height: 1em"
+          >
+            ​
+          </div>
+          <div
+            class="profile-email-small skeleton"
+            id="sidebarEmail"
+            style="min-width: 150px; height: 0.9em"
+          >
+            ​
           </div>
 
           <div class="profile-stats-mini">
             <div class="profile-stat-mini">
-              <span class="profile-stat-mini-num">12</span>
+              <span
+                class="profile-stat-mini-num skeleton"
+                id="statUploads"
+                style="min-width: 28px"
+                >—</span
+              >
               <span class="profile-stat-mini-label">Uploads</span>
             </div>
             <div class="profile-stat-mini">
-              <span class="profile-stat-mini-num">4</span>
+              <span
+                class="profile-stat-mini-num skeleton"
+                id="statMeses"
+                style="min-width: 28px"
+                >—</span
+              >
               <span class="profile-stat-mini-label">Meses</span>
             </div>
             <div class="profile-stat-mini">
-              <span class="profile-stat-mini-num">98%</span>
+              <span
+                class="profile-stat-mini-num skeleton"
+                id="statAtivo"
+                style="min-width: 36px"
+                >—</span
+              >
               <span class="profile-stat-mini-label">Ativo</span>
             </div>
           </div>
         </div>
 
-        <!-- Navegação do perfil -->
         <nav class="profile-nav">
           <button
             class="profile-nav-item active"
@@ -162,7 +376,6 @@
                   id="pf-nome"
                   class="form-input"
                   placeholder="João"
-                  value="João"
                   oninput="markChanged()"
                 />
               </div>
@@ -176,7 +389,6 @@
                   id="pf-sobrenome"
                   class="form-input"
                   placeholder="Silva"
-                  value="Silva"
                   oninput="markChanged()"
                 />
               </div>
@@ -190,7 +402,6 @@
                   id="pf-email"
                   class="form-input"
                   placeholder="seu@eniac.edu.br"
-                  value="joao@eniac.edu.br"
                   oninput="markChanged()"
                 />
               </div>
@@ -204,7 +415,6 @@
                   id="pf-telefone"
                   class="form-input"
                   placeholder="(11) 99999-9999"
-                  value=""
                   oninput="markChanged()"
                 />
               </div>
@@ -218,7 +428,6 @@
                   id="pf-cargo"
                   class="form-input"
                   placeholder="Ex: Analista ESG"
-                  value=""
                   oninput="markChanged()"
                 />
               </div>
@@ -232,7 +441,6 @@
                   id="pf-departamento"
                   class="form-input"
                   placeholder="Ex: Sustentabilidade"
-                  value=""
                   oninput="markChanged()"
                 />
               </div>
@@ -289,87 +497,92 @@
             <i class="fa-solid fa-lock"></i> Segurança
           </h3>
           <p class="profile-section-desc">
-            Altere sua senha periodicamente para manter sua conta protegida. Use
-            uma senha forte com letras, números e símbolos.
+            Altere sua senha periodicamente para manter sua conta protegida.
           </p>
 
-          <div class="profile-form-grid full">
-            <div class="profile-field">
-              <label for="pf-senha-atual">Senha atual</label>
-              <div class="input-wrap">
-                <i class="fa-solid fa-lock field-icon"></i>
-                <input
-                  type="password"
-                  id="pf-senha-atual"
-                  class="form-input has-toggle"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  class="toggle-pw"
-                  onclick="togglePw('pf-senha-atual', this)"
-                >
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-              </div>
-            </div>
-            <div class="profile-field">
-              <label for="pf-nova-senha">Nova senha</label>
-              <div class="input-wrap">
-                <i class="fa-solid fa-key field-icon"></i>
-                <input
-                  type="password"
-                  id="pf-nova-senha"
-                  class="form-input has-toggle"
-                  placeholder="Mínimo 8 caracteres"
-                  oninput="checkStrengthProfile(this.value)"
-                />
-                <button
-                  type="button"
-                  class="toggle-pw"
-                  onclick="togglePw('pf-nova-senha', this)"
-                >
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-              </div>
-              <div
-                class="pw-strength"
-                id="pwStrengthProfile"
-                style="display: block"
-              >
-                <div class="pw-strength-bar">
-                  <div class="pw-strength-fill" id="pwFillProfile"></div>
+          <div id="secSenhaWrap">
+            <div class="profile-form-grid full">
+              <div class="profile-field">
+                <label for="pf-senha-atual">Senha atual</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-lock field-icon"></i>
+                  <input
+                    type="password"
+                    id="pf-senha-atual"
+                    class="form-input has-toggle"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-pw"
+                    onclick="togglePw('pf-senha-atual', this)"
+                  >
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
                 </div>
-                <span class="pw-strength-label" id="pwLabelProfile"
-                  >Digite uma nova senha</span
+              </div>
+              <div class="profile-field">
+                <label for="pf-nova-senha">Nova senha</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-key field-icon"></i>
+                  <input
+                    type="password"
+                    id="pf-nova-senha"
+                    class="form-input has-toggle"
+                    placeholder="Mínimo 8 caracteres"
+                    oninput="checkStrengthProfile(this.value)"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-pw"
+                    onclick="togglePw('pf-nova-senha', this)"
+                  >
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
+                <div
+                  class="pw-strength"
+                  id="pwStrengthProfile"
+                  style="display: block"
                 >
+                  <div class="pw-strength-bar">
+                    <div class="pw-strength-fill" id="pwFillProfile"></div>
+                  </div>
+                  <span class="pw-strength-label" id="pwLabelProfile"
+                    >Digite uma nova senha</span
+                  >
+                </div>
+              </div>
+              <div class="profile-field">
+                <label for="pf-confirmar-senha">Confirmar nova senha</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-shield-halved field-icon"></i>
+                  <input
+                    type="password"
+                    id="pf-confirmar-senha"
+                    class="form-input has-toggle"
+                    placeholder="Repita a nova senha"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-pw"
+                    onclick="togglePw('pf-confirmar-senha', this)"
+                  >
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="profile-field">
-              <label for="pf-confirmar-senha">Confirmar nova senha</label>
-              <div class="input-wrap">
-                <i class="fa-solid fa-shield-halved field-icon"></i>
-                <input
-                  type="password"
-                  id="pf-confirmar-senha"
-                  class="form-input has-toggle"
-                  placeholder="Repita a nova senha"
-                />
-                <button
-                  type="button"
-                  class="toggle-pw"
-                  onclick="togglePw('pf-confirmar-senha', this)"
-                >
-                  <i class="fa-regular fa-eye"></i>
-                </button>
-              </div>
-            </div>
-          </div>
 
-          <div class="profile-actions" style="margin-top: 8px">
-            <button class="btn-profile-save" onclick="salvarSenha()">
-              <i class="fa-solid fa-shield-check"></i> Atualizar senha
-            </button>
+            <div class="profile-actions" style="margin-top: 8px">
+              <button
+                class="btn-profile-save"
+                id="btnSalvarSenha"
+                onclick="salvarSenha()"
+              >
+                <i class="fa-solid fa-shield-check"></i> Atualizar senha
+              </button>
+            </div>
           </div>
 
           <div class="profile-section-divider"></div>
@@ -380,19 +593,24 @@
             <i class="fa-solid fa-desktop"></i> Sessões ativas
           </h4>
           <p class="profile-section-desc" style="margin-bottom: 16px">
-            Sessões abertas na sua conta.
+            Sessões abertas na sua conta. A sessão atual é preservada ao
+            encerrar as demais.
           </p>
           <div class="profile-activity-item">
             <div class="activity-icon view">
               <i class="fa-solid fa-laptop"></i>
             </div>
             <div class="activity-text">
-              <div class="activity-title">Navegador — São Paulo, BR</div>
-              <div class="activity-time">Sessão atual · Chrome 124</div>
+              <div class="activity-title">Sessão atual — navegador</div>
+              <div class="activity-time" id="sessaoAtualInfo">Carregando…</div>
             </div>
           </div>
           <div style="margin-top: 14px">
-            <button class="btn-danger" onclick="encerrarOutrasSessoes()">
+            <button
+              class="btn-danger"
+              id="btnEncerrarSessoes"
+              onclick="encerrarOutrasSessoes()"
+            >
               <i class="fa-solid fa-right-from-bracket"></i> Encerrar outras
               sessões
             </button>
@@ -423,7 +641,7 @@
             <label class="pref-toggle">
               <input
                 type="checkbox"
-                checked
+                id="pref-notif-upload"
                 onchange="salvarPreferencia('notif_upload', this.checked)"
               />
               <span class="pref-toggle-track"></span>
@@ -440,7 +658,7 @@
             <label class="pref-toggle">
               <input
                 type="checkbox"
-                checked
+                id="pref-chart-anim"
                 onchange="salvarPreferencia('chart_anim', this.checked)"
               />
               <span class="pref-toggle-track"></span>
@@ -457,6 +675,7 @@
             <label class="pref-toggle">
               <input
                 type="checkbox"
+                id="pref-compact-mode"
                 onchange="salvarPreferencia('compact_mode', this.checked)"
               />
               <span class="pref-toggle-track"></span>
@@ -473,6 +692,7 @@
             <label class="pref-toggle">
               <input
                 type="checkbox"
+                id="pref-weekly-email"
                 onchange="salvarPreferencia('weekly_email', this.checked)"
               />
               <span class="pref-toggle-track"></span>
@@ -492,69 +712,32 @@
           <p class="profile-section-desc">
             Histórico das últimas ações realizadas na sua conta.
           </p>
-
-          <div class="profile-activity-item">
-            <div class="activity-icon upload">
-              <i class="fa-solid fa-file-csv"></i>
-            </div>
-            <div class="activity-text">
-              <div class="activity-title">
-                Upload de CSV — indicadores_q1_2025.csv
+          <div id="atividadeLista">
+            <!-- Preenchido pelo JS via GET /users/me/activity -->
+            <div class="profile-activity-item">
+              <div
+                class="activity-icon upload skeleton"
+                style="width: 40px; height: 40px; border-radius: 50%"
+              ></div>
+              <div class="activity-text">
+                <div
+                  class="activity-title skeleton"
+                  style="height: 1em; width: 200px"
+                >
+                  ​
+                </div>
+                <div
+                  class="activity-time skeleton"
+                  style="height: 0.8em; width: 120px; margin-top: 6px"
+                >
+                  ​
+                </div>
               </div>
-              <div class="activity-time">
-                há 2 horas · 342 registros importados
-              </div>
-            </div>
-          </div>
-          <div class="profile-activity-item">
-            <div class="activity-icon view">
-              <i class="fa-solid fa-chart-line"></i>
-            </div>
-            <div class="activity-text">
-              <div class="activity-title">
-                Visualização do Dashboard de Impacto
-              </div>
-              <div class="activity-time">
-                há 3 horas · filtro: Saúde &amp; Educação
-              </div>
-            </div>
-          </div>
-          <div class="profile-activity-item">
-            <div class="activity-icon edit">
-              <i class="fa-solid fa-pen"></i>
-            </div>
-            <div class="activity-text">
-              <div class="activity-title">Perfil atualizado</div>
-              <div class="activity-time">há 1 dia · cargo adicionado</div>
-            </div>
-          </div>
-          <div class="profile-activity-item">
-            <div class="activity-icon upload">
-              <i class="fa-solid fa-file-csv"></i>
-            </div>
-            <div class="activity-text">
-              <div class="activity-title">
-                Upload de CSV — projetos_dez_2024.csv
-              </div>
-              <div class="activity-time">
-                há 3 dias · 218 registros importados
-              </div>
-            </div>
-          </div>
-          <div class="profile-activity-item">
-            <div class="activity-icon view">
-              <i class="fa-solid fa-filter"></i>
-            </div>
-            <div class="activity-text">
-              <div class="activity-title">
-                Filtro aplicado — Área: Meio Ambiente
-              </div>
-              <div class="activity-time">há 5 dias</div>
             </div>
           </div>
         </div>
 
-        <!-- ── ZONA DE PERIGO (sempre visível abaixo) ── -->
+        <!-- ── ZONA DE PERIGO ── -->
         <div
           class="profile-section-card profile-danger-zone"
           id="section-dados-danger"
@@ -609,17 +792,17 @@
       </div>
     </footer>
 
-    <!-- ── TRANSIÇÃO ── -->
     <div class="multi-layer-transition" id="transition-container">
       <div class="layer layer-1"></div>
       <div class="layer layer-2"></div>
       <div class="layer layer-3"></div>
     </div>
 
+    <!-- ══════════════════════════════════════════════════════════════
+         SCRIPTS UTILITÁRIOS (inline — sem acesso a módulos ES)
+    ══════════════════════════════════════════════════════════════ -->
     <script>
-      /* ══════════════════════════════════════════
-         SILEO TOAST — sistema de notificações
-      ══════════════════════════════════════════ */
+      // ── Toast ────────────────────────────────────────────────────
       const TOAST_ICONS = {
         success: "fa-solid fa-circle-check",
         info: "fa-solid fa-circle-info",
@@ -631,11 +814,8 @@
         const container = document.getElementById("sileoToastContainer");
         const toast = document.createElement("div");
         toast.className = `sileo-toast ${type}`;
-
         toast.innerHTML = `
-          <div class="sileo-toast-icon-wrap">
-            <i class="${TOAST_ICONS[type] || TOAST_ICONS.info}"></i>
-          </div>
+          <div class="sileo-toast-icon-wrap"><i class="${TOAST_ICONS[type] || TOAST_ICONS.info}"></i></div>
           <div class="sileo-toast-body">
             <div class="sileo-toast-title">${title}</div>
             ${msg ? `<div class="sileo-toast-msg">${msg}</div>` : ""}
@@ -643,14 +823,11 @@
           <button class="sileo-toast-close" onclick="removeToast(this.closest('.sileo-toast'))">
             <i class="fa-solid fa-xmark"></i>
           </button>
-          <div class="sileo-toast-progress" style="animation-duration: ${duration}ms"></div>
+          <div class="sileo-toast-progress" style="animation-duration:${duration}ms"></div>
         `;
-
         container.appendChild(toast);
-
         const timer = setTimeout(() => removeToast(toast), duration);
         toast._timer = timer;
-
         return toast;
       }
 
@@ -662,12 +839,26 @@
         toast.addEventListener("animationend", () => toast.remove(), {
           once: true,
         });
-        setTimeout(() => toast.remove(), 350); // fallback
+        setTimeout(() => toast.remove(), 350);
       }
 
-      /* ══════════════════════════════════════════
-         NAVEGAÇÃO DAS SEÇÕES
-      ══════════════════════════════════════════ */
+      // ── Loading overlay ──────────────────────────────────────────
+      function showLoading(msg = "Carregando…") {
+        document.getElementById("profileLoadingMsg").textContent = msg;
+        document.getElementById("profileLoadingOverlay").classList.add("show");
+      }
+      function hideLoading() {
+        document
+          .getElementById("profileLoadingOverlay")
+          .classList.remove("show");
+      }
+
+      // ── Remoção de skeleton ──────────────────────────────────────
+      function removeSkeleton(el) {
+        if (el) el.classList.remove("skeleton");
+      }
+
+      // ── Navegação de seções ──────────────────────────────────────
       const SECTIONS = ["dados", "seguranca", "preferencias", "atividade"];
 
       function showSection(id, btn) {
@@ -675,27 +866,27 @@
           const el = document.getElementById("section-" + s);
           if (el) el.style.display = "none";
         });
-
         const target = document.getElementById("section-" + id);
         if (target) target.style.display = "block";
 
-        // Zona de perigo: visível apenas nas seções dados e segurança
         const dangerZone = document.getElementById("section-dados-danger");
         if (dangerZone) {
           dangerZone.style.display =
             id === "dados" || id === "seguranca" ? "block" : "none";
         }
 
-        // Atualiza nav ativa
         document
           .querySelectorAll(".profile-nav-item")
           .forEach((b) => b.classList.remove("active"));
         if (btn) btn.classList.add("active");
+
+        // Carrega atividade só quando a seção for aberta pela primeira vez
+        if (id === "atividade" && !window._atividadeCarregada) {
+          _carregarAtividade();
+        }
       }
 
-      /* ══════════════════════════════════════════
-         AVATAR
-      ══════════════════════════════════════════ */
+      // ── Avatar ───────────────────────────────────────────────────
       function triggerAvatarUpload() {
         document.getElementById("avatarInput").click();
       }
@@ -714,27 +905,27 @@
         const reader = new FileReader();
         reader.onload = (ev) => {
           const avatarEl = document.getElementById("profileAvatarDisplay");
-          avatarEl.innerHTML = `<img src="${ev.target.result}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
+          avatarEl.innerHTML = `<img src="${ev.target.result}" alt="Avatar"
+            style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
           sileoToast(
             "Foto atualizada!",
             "Sua imagem de perfil foi alterada.",
             "success",
           );
+          // TODO: enviar imagem ao servidor (POST /users/me/avatar) com FormData
         };
         reader.readAsDataURL(file);
       }
 
-      /* ══════════════════════════════════════════
-         FORMULÁRIO — Dados pessoais
-      ══════════════════════════════════════════ */
+      // ── Dados pessoais ───────────────────────────────────────────
       let _hasChanges = false;
+      let _dadosOriginais = {};
 
       function markChanged() {
         if (!_hasChanges) {
           _hasChanges = true;
           document.getElementById("dadosActions").style.display = "flex";
         }
-        // Atualiza sidebar em tempo real
         const nome = document.getElementById("pf-nome").value.trim();
         const sobrenome = document.getElementById("pf-sobrenome").value.trim();
         const email = document.getElementById("pf-email").value.trim();
@@ -745,6 +936,118 @@
         if (email) document.getElementById("sidebarEmail").textContent = email;
       }
 
+      // Chamada pelo módulo ES após carregar dados do servidor
+      window._preencherFormulario = function (user) {
+        const campos = {
+          "pf-nome": user.nome || "",
+          "pf-sobrenome": user.sobrenome || "",
+          "pf-email": user.email || "",
+          "pf-telefone": user.telefone || "",
+          "pf-cargo": user.cargo || "",
+          "pf-departamento": user.departamento || "",
+          "pf-bio": user.bio || "",
+        };
+        Object.entries(campos).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.value = val;
+            el.classList.remove("skeleton");
+          }
+        });
+        _dadosOriginais = { ...campos };
+
+        // Sidebar
+        const displayName =
+          [user.nome, user.sobrenome].filter(Boolean).join(" ") ||
+          user.email ||
+          "Usuário";
+        const nameEl = document.getElementById("sidebarName");
+        nameEl.textContent = displayName;
+        removeSkeleton(nameEl);
+
+        const emailEl = document.getElementById("sidebarEmail");
+        emailEl.textContent = user.email || "";
+        removeSkeleton(emailEl);
+
+        // Badge de role
+        const badge = document.getElementById("sidebarRole");
+        if (user.role === "admin") {
+          badge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Admin';
+          badge.className = "profile-role-badge admin";
+        } else {
+          badge.innerHTML = '<i class="fa-solid fa-user"></i> Usuário';
+          badge.className = "profile-role-badge user";
+        }
+        removeSkeleton(badge);
+
+        // Stats: tempo como membro
+        const criado = user.criado_em ? new Date(user.criado_em) : null;
+        if (criado) {
+          const meses = Math.floor(
+            (Date.now() - criado) / (1000 * 60 * 60 * 24 * 30),
+          );
+          const statMeses = document.getElementById("statMeses");
+          statMeses.textContent = meses;
+          removeSkeleton(statMeses);
+        }
+        removeSkeleton(document.getElementById("statUploads"));
+        removeSkeleton(document.getElementById("statAtivo"));
+
+        // Preenche preferências se vieram do servidor
+        if (user.preferencias) {
+          Object.entries(user.preferencias).forEach(([k, v]) => {
+            const el = document.getElementById("pref-" + k.replace(/_/g, "-"));
+            if (el) el.checked = !!v;
+          });
+        }
+
+        // Sessão atual
+        const sessaoEl = document.getElementById("sessaoAtualInfo");
+        if (sessaoEl) {
+          const agora = new Date().toLocaleString("pt-BR");
+          sessaoEl.textContent = `Sessão atual · ${agora}`;
+        }
+
+        // Login social: e-mail somente leitura
+        if (user.provider && user.provider !== "email") {
+          const emailInput = document.getElementById("pf-email");
+          emailInput.readOnly = true;
+          emailInput.title =
+            "E-mail vinculado à conta social — não pode ser alterado aqui.";
+          emailInput.style.opacity = "0.6";
+          emailInput.style.cursor = "not-allowed";
+
+          // Esconde seção de senha para contas sociais
+          const secSenha = document.getElementById("secSenhaWrap");
+          if (secSenha) {
+            secSenha.insertAdjacentHTML(
+              "beforebegin",
+              `<div class="profile-section-desc" style="color:rgba(255,215,0,0.7);margin-bottom:16px">
+                <i class="fa-solid fa-circle-info"></i>
+                Sua conta usa login social. A senha é gerenciada pelo provedor (Google/GitHub/LinkedIn).
+               </div>`,
+            );
+            secSenha.style.display = "none";
+          }
+        }
+
+        // Foto de perfil (login social)
+        if (user.photoURL) {
+          const avatarEl = document.getElementById("profileAvatarDisplay");
+          avatarEl.innerHTML = `<img src="${user.photoURL}" alt="Avatar"
+            style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
+        }
+
+        // has-value para ícones
+        document.querySelectorAll(".form-input").forEach((inp) => {
+          inp
+            .closest(".input-wrap")
+            ?.classList.toggle("has-value", inp.value.length > 0);
+        });
+      };
+
+      // ── Salvar dados pessoais ────────────────────────────────────
+      // (chama o módulo ES via window._authSalvarDados injetado abaixo)
       function salvarDados() {
         const nome = document.getElementById("pf-nome").value.trim();
         const sobrenome = document.getElementById("pf-sobrenome").value.trim();
@@ -763,19 +1066,53 @@
           return;
         }
 
-        /* TODO: PUT /users/me com os dados do formulário */
-        _hasChanges = false;
-        document.getElementById("dadosActions").style.display = "none";
-        sileoToast(
-          "Perfil salvo!",
-          "Seus dados foram atualizados com sucesso.",
-          "success",
-        );
+        const dados = {
+          nome,
+          sobrenome,
+          email,
+          telefone: document.getElementById("pf-telefone").value.trim(),
+          cargo: document.getElementById("pf-cargo").value.trim(),
+          departamento: document.getElementById("pf-departamento").value.trim(),
+          bio: document.getElementById("pf-bio").value.trim(),
+        };
+
+        showLoading("Salvando dados…");
+
+        if (typeof window._authSalvarDados === "function") {
+          window
+            ._authSalvarDados(dados)
+            .then(() => {
+              _hasChanges = false;
+              _dadosOriginais = { ...dados };
+              document.getElementById("dadosActions").style.display = "none";
+              sileoToast(
+                "Perfil salvo!",
+                "Seus dados foram atualizados com sucesso.",
+                "success",
+              );
+            })
+            .catch((err) => {
+              sileoToast(
+                "Erro ao salvar",
+                err.message || "Tente novamente.",
+                "error",
+              );
+            })
+            .finally(hideLoading);
+        } else {
+          hideLoading();
+          sileoToast("Módulo não carregado", "Recarregue a página.", "error");
+        }
       }
 
       function cancelarEdicao() {
         _hasChanges = false;
         document.getElementById("dadosActions").style.display = "none";
+        // Restaura valores originais
+        Object.entries(_dadosOriginais).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val;
+        });
         sileoToast(
           "Edição cancelada",
           "Nenhuma alteração foi salva.",
@@ -784,9 +1121,7 @@
         );
       }
 
-      /* ══════════════════════════════════════════
-         SEGURANÇA — troca de senha
-      ══════════════════════════════════════════ */
+      // ── Segurança — troca de senha ───────────────────────────────
       function checkStrengthProfile(val) {
         const fill = document.getElementById("pwFillProfile");
         const label = document.getElementById("pwLabelProfile");
@@ -842,34 +1177,88 @@
           return;
         }
 
-        /* TODO: PATCH /users/me/password */
-        document.getElementById("pf-senha-atual").value = "";
-        document.getElementById("pf-nova-senha").value = "";
-        document.getElementById("pf-confirmar-senha").value = "";
-        document.getElementById("pwFillProfile").style.width = "0";
-        document.getElementById("pwLabelProfile").textContent =
-          "Digite uma nova senha";
-        sileoToast(
-          "Senha atualizada!",
-          "Sua senha foi alterada com segurança.",
-          "success",
-        );
+        const btn = document.getElementById("btnSalvarSenha");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i> Atualizando…';
+
+        if (typeof window._authTrocarSenha === "function") {
+          window
+            ._authTrocarSenha(atual, nova)
+            .then(() => {
+              document.getElementById("pf-senha-atual").value = "";
+              document.getElementById("pf-nova-senha").value = "";
+              document.getElementById("pf-confirmar-senha").value = "";
+              document.getElementById("pwFillProfile").style.width = "0";
+              document.getElementById("pwLabelProfile").textContent =
+                "Digite uma nova senha";
+              sileoToast(
+                "Senha atualizada!",
+                "Sua senha foi alterada com segurança.",
+                "success",
+              );
+            })
+            .catch((err) => {
+              sileoToast(
+                "Erro ao atualizar senha",
+                err.message || "Tente novamente.",
+                "error",
+              );
+            })
+            .finally(() => {
+              btn.disabled = false;
+              btn.innerHTML =
+                '<i class="fa-solid fa-shield-check"></i> Atualizar senha';
+            });
+        } else {
+          btn.disabled = false;
+          btn.innerHTML =
+            '<i class="fa-solid fa-shield-check"></i> Atualizar senha';
+          sileoToast("Módulo não carregado", "Recarregue a página.", "error");
+        }
       }
 
       function encerrarOutrasSessoes() {
-        /* TODO: DELETE /auth/sessions/others */
-        sileoToast(
-          "Sessões encerradas",
-          "Todos os outros dispositivos foram desconectados.",
-          "success",
-        );
+        const btn = document.getElementById("btnEncerrarSessoes");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i> Encerrando…';
+
+        if (typeof window._authRevogarSessoes === "function") {
+          window
+            ._authRevogarSessoes()
+            .then(() => {
+              sileoToast(
+                "Sessões encerradas",
+                "Todos os outros dispositivos foram desconectados.",
+                "success",
+              );
+            })
+            .catch((err) => {
+              sileoToast(
+                "Erro",
+                err.message || "Não foi possível encerrar as sessões.",
+                "error",
+              );
+            })
+            .finally(() => {
+              btn.disabled = false;
+              btn.innerHTML =
+                '<i class="fa-solid fa-right-from-bracket"></i> Encerrar outras sessões';
+            });
+        } else {
+          btn.disabled = false;
+          btn.innerHTML =
+            '<i class="fa-solid fa-right-from-bracket"></i> Encerrar outras sessões';
+          sileoToast("Módulo não carregado", "Recarregue a página.", "error");
+        }
       }
 
-      /* ══════════════════════════════════════════
-         PREFERÊNCIAS
-      ══════════════════════════════════════════ */
+      // ── Preferências ─────────────────────────────────────────────
       function salvarPreferencia(key, value) {
-        /* TODO: PATCH /users/me/preferences { [key]: value } */
+        if (typeof window._authSalvarPreferencia === "function") {
+          window._authSalvarPreferencia(key, value).catch(() => {});
+        }
         sileoToast(
           value ? "Preferência ativada" : "Preferência desativada",
           key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
@@ -878,9 +1267,71 @@
         );
       }
 
-      /* ══════════════════════════════════════════
-         ZONA DE PERIGO
-      ══════════════════════════════════════════ */
+      // ── Atividade ────────────────────────────────────────────────
+      async function _carregarAtividade() {
+        window._atividadeCarregada = true;
+        const lista = document.getElementById("atividadeLista");
+
+        if (typeof window._authGetToken !== "function") {
+          lista.innerHTML =
+            '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Módulo não carregado.</p>';
+          return;
+        }
+
+        const token = window._authGetToken();
+        if (!token) {
+          lista.innerHTML =
+            '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Não autenticado.</p>';
+          return;
+        }
+
+        try {
+          const res = await fetch(window._authApiBase + "/users/me/activity", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (!res.ok) throw new Error("Sem dados de atividade.");
+
+          const atividades = await res.json();
+          if (!atividades.length) {
+            lista.innerHTML =
+              '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Nenhuma atividade registrada.</p>';
+            return;
+          }
+
+          const iconMap = {
+            upload: { icon: "fa-file-csv", cls: "upload" },
+            view: { icon: "fa-chart-line", cls: "view" },
+            edit: { icon: "fa-pen", cls: "edit" },
+            login: { icon: "fa-arrow-right-to-bracket", cls: "view" },
+          };
+
+          lista.innerHTML = atividades
+            .map((a) => {
+              const type = iconMap[a.tipo] || iconMap.view;
+              const tempo = a.criado_em
+                ? new Date(a.criado_em).toLocaleString("pt-BR")
+                : "—";
+              return `
+              <div class="profile-activity-item">
+                <div class="activity-icon ${type.cls}">
+                  <i class="fa-solid ${type.icon}"></i>
+                </div>
+                <div class="activity-text">
+                  <div class="activity-title">${a.descricao || "Ação registrada"}</div>
+                  <div class="activity-time">${tempo}</div>
+                </div>
+              </div>
+            `;
+            })
+            .join("");
+        } catch (_) {
+          lista.innerHTML =
+            '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Não foi possível carregar atividades.</p>';
+        }
+      }
+
+      // ── Zona de perigo ───────────────────────────────────────────
       function exportarDados() {
         sileoToast(
           "Exportação iniciada",
@@ -890,7 +1341,7 @@
       }
 
       function confirmarExclusao() {
-        const t = sileoToast(
+        sileoToast(
           "⚠ Excluir conta?",
           "Esta ação é permanente e não pode ser desfeita.",
           "error",
@@ -898,18 +1349,44 @@
         );
       }
 
+      // ── Logout ───────────────────────────────────────────────────
       function confirmarLogout() {
-        /* TODO: POST /auth/logout + redirecionar para login */
-        const container = document.getElementById("transition-container");
-        container.classList.add("active");
-        setTimeout(() => {
-          window.location.href = "./login.html";
-        }, 650);
+        if (typeof window._authLogout !== "function") {
+          // Fallback se módulo não carregou
+          sessionStorage.clear();
+          const container = document.getElementById("transition-container");
+          container.classList.add("active");
+          setTimeout(() => {
+            window.location.href = "./login.html";
+          }, 650);
+          return;
+        }
+
+        // Mostra confirmação antes de sair
+        const t = sileoToast(
+          "Sair da conta?",
+          "Clique novamente em <strong>Sair</strong> para confirmar.",
+          "warning",
+          5000,
+        );
+
+        // Segundo clique confirma — ou simplesmente executamos após toast exibido
+        // Abordagem: modal simples inline
+        const btnArea = document.createElement("div");
+        btnArea.style.cssText = "display:flex;gap:8px;margin-top:10px";
+        btnArea.innerHTML = `
+          <button onclick="window._authLogout(false)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,100,100,0.4);background:rgba(231,76,60,0.15);color:#e74c3c;font-size:.8rem;cursor:pointer;font-family:inherit">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair desta sessão
+          </button>
+          <button onclick="window._authLogout(true)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(231,76,60,0.6);background:rgba(231,76,60,0.25);color:#e74c3c;font-size:.8rem;cursor:pointer;font-family:inherit">
+            <i class="fa-solid fa-right-from-bracket"></i> Sair de tudo
+          </button>
+        `;
+        const body = t.querySelector(".sileo-toast-body");
+        if (body) body.appendChild(btnArea);
       }
 
-      /* ══════════════════════════════════════════
-         UTILITÁRIOS
-      ══════════════════════════════════════════ */
+      // ── Utilitários ──────────────────────────────────────────────
       function togglePw(inputId, btn) {
         const input = document.getElementById(inputId);
         const icon = btn.querySelector("i");
@@ -923,107 +1400,11 @@
       }
 
       function toggleMenu() {
-        var nav = document.getElementById("menu");
-        var btn = document.querySelector(".menu-btn");
-        var isOpen = nav.classList.toggle("open");
+        const nav = document.getElementById("menu");
+        const btn = document.querySelector(".menu-btn");
+        const isOpen = nav.classList.toggle("open");
         if (btn) btn.setAttribute("aria-expanded", isOpen);
       }
-
-      /* ── Input has-value para overlay de fill ── */
-      /* ══════════════════════════════════════════
-         CARREGAR DADOS DO USUÁRIO (localStorage + sessionStorage)
-      ══════════════════════════════════════════ */
-      (function loadProfileData() {
-        const role = localStorage.getItem("esg_user_role") || "user";
-        const email = localStorage.getItem("esg_user_email") || "";
-        const nome = localStorage.getItem("esg_user_nome") || "";
-        const photo = localStorage.getItem("esg_user_photo") || null;
-        const isSocial = !!photo; // conta social sempre tem foto
-
-        // Monta nome de exibição
-        let displayName = nome || email.split("@")[0] || "Usuário";
-        let firstName = displayName.split(" ")[0];
-        let lastName = displayName.split(" ").slice(1).join(" ");
-
-        // ── Sidebar ──────────────────────────────────────
-        const sidebarNameEl = document.getElementById("sidebarName");
-        if (sidebarNameEl) sidebarNameEl.textContent = displayName;
-
-        const sidebarEmailEl = document.getElementById("sidebarEmail");
-        if (sidebarEmailEl) sidebarEmailEl.textContent = email;
-
-        // Badge de role
-        const badge = document.getElementById("sidebarRole");
-        if (badge) {
-          if (role === "admin") {
-            badge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Admin';
-            badge.className = "profile-role-badge admin";
-          } else {
-            badge.innerHTML = '<i class="fa-solid fa-user"></i> Usuário';
-            badge.className = "profile-role-badge user";
-          }
-        }
-
-        // ── Foto de perfil (login social) ────────────────
-        if (photo) {
-          const avatarEl = document.getElementById("profileAvatarDisplay");
-          if (avatarEl) {
-            avatarEl.innerHTML = `<img src="${photo}" alt="Avatar"
-              style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
-          }
-        }
-
-        // ── Preenche formulário de dados pessoais ────────
-        const nomeInput = document.getElementById("pf-nome");
-        const sobreInput = document.getElementById("pf-sobrenome");
-        const emailInput = document.getElementById("pf-email");
-
-        if (nomeInput && firstName) {
-          nomeInput.value = firstName;
-        }
-        if (sobreInput && lastName) {
-          sobreInput.value = lastName;
-        }
-        if (emailInput && email) {
-          emailInput.value = email;
-        }
-
-        // Login social: email somente leitura (não pode alterar pelo NestJS diretamente)
-        if (isSocial && emailInput) {
-          emailInput.readOnly = true;
-          emailInput.title =
-            "E-mail vinculado à conta social — não pode ser alterado aqui.";
-          emailInput.style.opacity = "0.6";
-          emailInput.style.cursor = "not-allowed";
-        }
-
-        // ── Seção de segurança: esconde troca de senha para login social ──
-        if (isSocial) {
-          const secSenha = document.querySelector(
-            "#section-seguranca .profile-form-grid",
-          );
-          const btnSenha = document.querySelector(
-            "#section-seguranca .btn-profile-save",
-          );
-          if (secSenha)
-            secSenha.insertAdjacentHTML(
-              "beforebegin",
-              `<div class="profile-section-desc" style="color:rgba(255,215,0,0.7);margin-bottom:16px;">
-              <i class="fa-solid fa-circle-info"></i>
-              Sua conta usa login social. A senha é gerenciada pelo provedor (Google/GitHub/LinkedIn).
-             </div>`,
-            );
-          if (secSenha) secSenha.style.display = "none";
-          if (btnSenha) btnSenha.style.display = "none";
-        }
-
-        // Trigger has-value para ícones de campo
-        document.querySelectorAll(".form-input").forEach((inp) => {
-          inp
-            .closest(".input-wrap")
-            ?.classList.toggle("has-value", inp.value.length > 0);
-        });
-      })();
 
       document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".form-input").forEach((input) => {
@@ -1037,7 +1418,6 @@
           check();
         });
 
-        /* Fecha menu mobile ao clicar fora */
         document.addEventListener("click", (e) => {
           const nav = document.getElementById("menu");
           const btn = document.querySelector(".menu-btn");
@@ -1046,6 +1426,80 @@
           }
         });
       });
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         MÓDULO ES — integração real com auth.js
+         Carrega dados do servidor e injeta funções no window.*
+    ══════════════════════════════════════════════════════════════ -->
+    <script type="module">
+      import {
+        fetchMe,
+        getToken,
+        handleLogout,
+        handleChangePassword,
+        handleUpdateProfile,
+        handleUpdatePreference,
+        handleRevokeOtherSessions,
+        isLoggedIn,
+      } from "../js/auth.js";
+
+      import { API_BASE } from "../js/config.js";
+
+      // ── Guarda de autenticação ────────────────────────────────────
+      if (!isLoggedIn()) {
+        // JWT ausente ou expirado → redireciona para login
+        window.location.replace("./login.html");
+      }
+
+      // ── Expõe helpers para os scripts inline ─────────────────────
+      window._authGetToken = getToken;
+      window._authApiBase = API_BASE;
+      window._authLogout = handleLogout;
+      window._authTrocarSenha = handleChangePassword;
+      window._authRevogarSessoes = handleRevokeOtherSessions;
+      window._authSalvarPreferencia = handleUpdatePreference;
+
+      window._authSalvarDados = async function (dados) {
+        return await handleUpdateProfile(dados);
+      };
+
+      // ── Carrega dados do usuário do servidor ──────────────────────
+      try {
+        const user = await fetchMe();
+
+        if (!user) {
+          // Token inválido/expirado — redireciona
+          window.location.replace("./login.html");
+        } else {
+          // Preenche UI com dados reais
+          if (typeof window._preencherFormulario === "function") {
+            window._preencherFormulario(user);
+          }
+
+          // Atualiza mini-stats se o servidor retornar
+          if (user.uploads_total !== undefined) {
+            const el = document.getElementById("statUploads");
+            if (el) {
+              el.textContent = user.uploads_total;
+              el.classList.remove("skeleton");
+            }
+          }
+          if (user.ativo_pct !== undefined) {
+            const el = document.getElementById("statAtivo");
+            if (el) {
+              el.textContent = user.ativo_pct + "%";
+              el.classList.remove("skeleton");
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao carregar perfil:", err);
+        // Remove skeletons para não travar a UI
+        document
+          .querySelectorAll(".skeleton")
+          .forEach((el) => el.classList.remove("skeleton"));
+      }
     </script>
   </body>
 </html>

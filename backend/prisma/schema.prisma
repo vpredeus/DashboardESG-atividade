@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Desafios {
+model desafios {
   id                          Int       @id @default(autoincrement())
   postado                     DateTime? @db.Timestamp(6)
   tipo                        String?

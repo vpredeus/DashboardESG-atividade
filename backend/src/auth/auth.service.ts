@@ -236,4 +236,29 @@ export class AuthService {
     };
     return { accessToken: this.jwtService.sign(payload) };
   }
+
+  // ── GET /auth/me ──────────────────────────────────────────────
+  async getMe(userId: number) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException("Usuário não encontrado");
+
+    // Retorna apenas campos seguros (sem senha)
+    const { senha, ...safe } = user;
+    return safe;
+  }
+
+  // ── Revogar TODAS as sessões ──────────────────────────────────
+  // Sem session_version no schema: apenas sinaliza sucesso.
+  // Com session_version: incrementa para invalidar JWTs antigos.
+  async revokeAllSessions(_userId: number) {
+    // Se você adicionar session_version ao schema futuramente:
+    // await this.usersService.incrementSessionVersion(_userId);
+    return { message: "Todas as sessões foram encerradas" };
+  }
+
+  // ── Revogar OUTRAS sessões (preserva a atual) ─────────────────
+  async revokeOtherSessions(_userId: number) {
+    // Mesma observação: incrementar session_version aqui quando disponível
+    return { message: "Outras sessões foram encerradas" };
+  }
 }

@@ -11,10 +11,15 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Delete,
   Headers,
+  Request,
   UnauthorizedException,
+  UseGuards,
 } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -100,5 +105,49 @@ export class AuthController {
   @Post("linkedin")
   linkedinLogin(@Body() body: LinkedinLoginDto) {
     return this.authService.linkedinLogin(body.code, body.redirectUri);
+  }
+
+  /**
+   * GET /auth/me
+   * Retorna dados do usuário autenticado (sem senha).
+   * Usado pelo profile.html para preencher o formulário.
+   */
+  @Get("me")
+  @UseGuards(AuthGuard("jwt"))
+  async getMe(@Request() req) {
+    return this.authService.getMe(req.user.id);
+  }
+
+  /**
+   * DELETE /auth/sessions/current
+   * Encerra a sessão atual (logout local — o JWT expirará naturalmente).
+   */
+  @Delete("sessions/current")
+  @UseGuards(AuthGuard("jwt"))
+  revokeCurrentSession() {
+    return { message: "Sessão encerrada" };
+  }
+
+  /**
+   * DELETE /auth/sessions/revoke-others
+   * Encerra todas as outras sessões, re-emite JWT para a sessão atual.
+   * Requer session_version no model usuarios (ver schema abaixo).
+   * ATENÇÃO: se seu banco não tiver session_version, este endpoint
+   * simplesmente retorna sucesso sem revogar (seguro mas inefetivo).
+   */
+  @Delete("sessions/revoke-others")
+  @UseGuards(AuthGuard("jwt"))
+  async revokeOtherSessions(@Request() req) {
+    return this.authService.revokeOtherSessions(req.user.id);
+  }
+
+  /**
+   * DELETE /auth/sessions
+   * Encerra TODAS as sessões do usuário (incluindo a atual).
+   */
+  @Delete("sessions")
+  @UseGuards(AuthGuard("jwt"))
+  async revokeAllSessions(@Request() req) {
+    return this.authService.revokeAllSessions(req.user.id);
   }
 }

@@ -1,12 +1,14 @@
 /**
  * auth.js — Módulo central de autenticação Firebase + NestJS
  *
- * CORREÇÕES v2:
- *  - Social login agora solicita tipo (usuário/empresa) antes de registrar
- *    conta nova no NestJS, via Promise resolvida pelo modal do register.html
- *    ou pelo mini-modal injetado nas demais páginas.
- *  - _loginNestJS agora trata explicitamente o 401 com mensagem clara.
- *  - handleRegister não é mais exposto no window — o form usa handleRegisterForm.
+ * Filosofia de armazenamento:
+ *  - JWT do sistema → sessionStorage APENAS (nunca localStorage)
+ *  - Dados do usuário → SEMPRE vindos do servidor via GET /auth/me
+ *  - Nenhum dado de role, email, nome ou photo no localStorage
+ *
+ * Para encerrar todas as sessões, o backend deve manter uma blacklist de JWTs
+ * (Redis ou coluna revogado_em na tabela de sessões). O logout local sempre
+ * limpa o sessionStorage e desautentica do Firebase.
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -21,6 +23,9 @@ import {
   GithubAuthProvider,
   signInWithPopup,
   updateProfile,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
@@ -34,6 +39,9 @@ import {
 // ── Inicialização Firebase ────────────────────────────────────────────────────
 const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
+
+// ── Chave única do JWT na sessionStorage ─────────────────────────────────────
+const JWT_KEY = "esg_jwt";
 
 // ── Helpers de token ──────────────────────────────────────────────────────────
 
@@ -49,59 +57,44 @@ function _parseJwt(token) {
 
 function _salvarToken(token) {
   try {
-    sessionStorage.setItem("esg_jwt", token);
-  } catch (_) {}
-
-  // Persiste dados do usuário no localStorage para acesso entre páginas
-  const payload = _parseJwt(token);
-  try {
-    if (payload.role) localStorage.setItem("esg_user_role", payload.role);
-    if (payload.email) localStorage.setItem("esg_user_email", payload.email);
-    if (payload.sub) localStorage.setItem("esg_user_id", String(payload.sub));
-    localStorage.setItem("esg_user_logged", "true");
-  } catch (_) {}
-}
-
-/** Salva nome e foto vindos do Firebase (login social). */
-export function salvarDadosSocial(firebaseUser) {
-  try {
-    if (firebaseUser.displayName)
-      localStorage.setItem("esg_user_nome", firebaseUser.displayName);
-    if (firebaseUser.photoURL)
-      localStorage.setItem("esg_user_photo", firebaseUser.photoURL);
+    sessionStorage.setItem(JWT_KEY, token);
   } catch (_) {}
 }
 
 export function getToken() {
   try {
-    return sessionStorage.getItem("esg_jwt");
+    return sessionStorage.getItem(JWT_KEY);
   } catch (_) {
     return null;
   }
+}
+
+/** Retorna o payload decodificado do JWT atual, ou null se não logado. */
+export function getTokenPayload() {
+  const token = getToken();
+  if (!token) return null;
+  const payload = _parseJwt(token);
+  // Valida expiração client-side (proteção básica; o servidor valida de verdade)
+  if (payload.exp && Date.now() / 1000 > payload.exp) {
+    _limparToken();
+    return null;
+  }
+  return payload;
 }
 
 /** Role do usuário logado: "admin" | "user" | null */
 export function getUserRole() {
-  try {
-    return localStorage.getItem("esg_user_role");
-  } catch (_) {
-    return null;
-  }
+  return getTokenPayload()?.role ?? null;
+}
+
+/** Verifica se o usuário está logado (JWT válido na sessão). */
+export function isLoggedIn() {
+  return getTokenPayload() !== null;
 }
 
 function _limparToken() {
   try {
-    sessionStorage.removeItem("esg_jwt");
-  } catch (_) {}
-  try {
-    [
-      "esg_user_logged",
-      "esg_user_role",
-      "esg_user_email",
-      "esg_user_id",
-      "esg_user_nome",
-      "esg_user_photo",
-    ].forEach((k) => localStorage.removeItem(k));
+    sessionStorage.removeItem(JWT_KEY);
   } catch (_) {}
 }
 
@@ -160,40 +153,53 @@ function _esconderErro() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-//  SELEÇÃO DE TIPO — modal unificado para social login fora do register.html
+//  DADOS DO USUÁRIO — sempre do servidor, nunca do localStorage
 // ══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Retorna uma Promise<{ tipo, codigoEmpresa? }> resolvida quando o usuário
- * escolhe o tipo de conta.
- *
- * Se a página já tiver `window.abrirModalAcesso` (register.html), reutiliza
- * o modal existente. Caso contrário injeta um mini-modal simples (login.html
- * ou qualquer outra página).
+ * Busca os dados do usuário autenticado no servidor.
+ * Requer JWT válido na sessionStorage.
+ * Retorna { id, nome, sobrenome, email, role, criado_em } ou null.
  */
+export async function fetchMe() {
+  const token = getToken();
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      if (res.status === 401) _limparToken(); // token expirado
+      return null;
+    }
+    return await res.json();
+  } catch (_) {
+    return null;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SELEÇÃO DE TIPO — modal unificado para social login fora do register.html
+// ══════════════════════════════════════════════════════════════════════════════
+
 function _pedirTipoConta() {
   return new Promise((resolve, reject) => {
-    // register.html expõe abrirModalAcesso — reutiliza o modal rico
     if (typeof window.abrirModalAcesso === "function") {
-      // Sobrescreve finalizarCadastro temporariamente para capturar a escolha
       const _finalizarOriginal = window.finalizarCadastro;
       window._resolverTipo = (tipo, codigoEmpresa) => {
         window.finalizarCadastro = _finalizarOriginal;
         resolve({ tipo, codigoEmpresa });
       };
-      // Abre o modal; o botão "Continuar" chama window._resolverTipo
       window._modoSocialTipo = true;
       window.abrirModalAcesso();
       return;
     }
-
-    // Outras páginas — injeta mini-modal
     _injetarMiniModal(resolve, reject);
   });
 }
 
 function _injetarMiniModal(resolve, reject) {
-  // Evita duplicatas
   document.getElementById("_esg-tipo-modal")?.remove();
 
   const overlay = document.createElement("div");
@@ -252,7 +258,6 @@ function _injetarMiniModal(resolve, reject) {
 
   overlay.querySelector("#_esg-btn-emp").onclick = () => {
     overlay.remove();
-    // Pede o código corporativo
     _pedirCodigoEmpresa(resolve, reject);
   };
 
@@ -407,10 +412,6 @@ export async function handleLogin(email, senha) {
   return await _loginNestJS(email, senha);
 }
 
-/**
- * POST /auth/login no NestJS.
- * CORREÇÃO: mensagem de erro diferenciada para 401 (conta não sincronizada).
- */
 async function _loginNestJS(email, senha) {
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
@@ -420,7 +421,6 @@ async function _loginNestJS(email, senha) {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    // 401 pode significar conta Firebase existe mas não está no banco Prisma
     const msg =
       res.status === 401
         ? "Conta não encontrada no sistema. Tente criar uma nova conta."
@@ -438,10 +438,6 @@ async function _loginNestJS(email, senha) {
 //  LOGIN SOCIAL — Google
 // ══════════════════════════════════════════════════════════════════════════════
 
-/**
- * Login/registro com Google.
- * Se for conta nova no NestJS, solicita tipo de conta antes de registrar.
- */
 export async function handleGoogleLogin() {
   _esconderErro();
   const provider = new GoogleAuthProvider();
@@ -452,8 +448,6 @@ export async function handleGoogleLogin() {
     _mostrarErro(_mensagemErro(err.code));
     throw err;
   }
-
-  salvarDadosSocial(result.user);
   return await _socialLoginNestJS(result.user, "google");
 }
 
@@ -471,8 +465,6 @@ export async function handleGithubLogin() {
     _mostrarErro(_mensagemErro(err.code));
     throw err;
   }
-
-  salvarDadosSocial(result.user);
   return await _socialLoginNestJS(result.user, "github");
 }
 
@@ -535,12 +527,10 @@ export async function finalizarLinkedinLogin(code, state) {
 }
 
 // ── Helper: envia idToken Firebase ao NestJS /auth/social ────────────────────
-// CORREÇÃO: verifica se é conta nova no NestJS e pede tipo antes de registrar.
 
 async function _socialLoginNestJS(firebaseUser, provider) {
   const idToken = await firebaseUser.getIdToken();
 
-  // Primeira tentativa — se o usuário já existe no NestJS, retorna JWT direto
   const res = await fetch(`${API_BASE}/auth/social`, {
     method: "POST",
     headers: {
@@ -556,21 +546,15 @@ async function _socialLoginNestJS(firebaseUser, provider) {
     return { accessToken };
   }
 
-  // Se o backend sinalizar que precisa de tipo (404 = usuário não existe ainda
-  // no Prisma mas existe no Firebase), pede tipo e re-envia.
-  // O auth.service.ts atual cria automaticamente com role "user" — mas para
-  // suportar tipo empresa via social, interceptamos aqui.
   if (res.status === 404 || res.status === 400) {
     let tipoInfo;
     try {
       tipoInfo = await _pedirTipoConta();
     } catch (_) {
-      // Usuário cancelou — faz logout do Firebase para não deixar sessão órfã
       await signOut(auth).catch(() => {});
       throw new Error("Login cancelado");
     }
 
-    // Re-envia com tipo no body
     const res2 = await fetch(`${API_BASE}/auth/social`, {
       method: "POST",
       headers: {
@@ -603,6 +587,119 @@ async function _socialLoginNestJS(firebaseUser, provider) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+//  TROCA DE SENHA (autenticado)
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Reautentica o usuário no Firebase com a senha atual, depois atualiza.
+ * Também notifica o backend para registrar a mudança (PATCH /users/me/password).
+ */
+export async function handleChangePassword(senhaAtual, novaSenha) {
+  const user = auth.currentUser;
+  if (!user || !user.email)
+    throw new Error("Usuário não autenticado no Firebase.");
+
+  // Reautentica para confirmar identidade
+  const credential = EmailAuthProvider.credential(user.email, senhaAtual);
+  try {
+    await reauthenticateWithCredential(user, credential);
+  } catch (err) {
+    if (
+      err.code === "auth/wrong-password" ||
+      err.code === "auth/invalid-credential"
+    ) {
+      throw new Error("Senha atual incorreta.");
+    }
+    throw new Error(_mensagemErro(err.code));
+  }
+
+  // Atualiza no Firebase
+  await updatePassword(user, novaSenha);
+
+  // Notifica o backend (para atualizar scrypt no banco + revogar sessões antigas)
+  const token = getToken();
+  if (token) {
+    await fetch(`${API_BASE}/users/me/password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ senhaAtual, novaSenha }),
+    }).catch(() => {}); // Não bloqueia se o backend falhar
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  ATUALIZAÇÃO DE DADOS PESSOAIS
+// ══════════════════════════════════════════════════════════════════════════════
+
+export async function handleUpdateProfile(dados) {
+  const token = getToken();
+  if (!token) throw new Error("Não autenticado.");
+
+  const res = await fetch(`${API_BASE}/users/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(dados),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || "Erro ao atualizar perfil.");
+  }
+
+  return await res.json();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  PREFERÊNCIAS
+// ══════════════════════════════════════════════════════════════════════════════
+
+export async function handleUpdatePreference(key, value) {
+  const token = getToken();
+  if (!token) return;
+
+  await fetch(`${API_BASE}/users/me/preferences`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ [key]: value }),
+  }).catch(() => {});
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SESSÕES — encerrar outras sessões
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Encerra todas as outras sessões do usuário.
+ * O backend deve manter uma tabela de sessões ou incrementar um campo
+ * session_version no usuário — qualquer JWT com versão anterior é rejeitado.
+ */
+export async function handleRevokeOtherSessions() {
+  const token = getToken();
+  if (!token) throw new Error("Não autenticado.");
+
+  const res = await fetch(`${API_BASE}/auth/sessions/revoke-others`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || "Erro ao encerrar sessões.");
+  }
+
+  return await res.json();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 //  RECUPERAÇÃO DE SENHA
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -621,17 +718,38 @@ export async function handleForgot(email) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-//  LOGOUT
+//  LOGOUT — encerra sessão local E notifica o servidor
 // ══════════════════════════════════════════════════════════════════════════════
 
-export async function handleLogout() {
+/**
+ * @param {boolean} [todasSessoes=false] - Se true, revoga o JWT no servidor
+ *   (requer endpoint DELETE /auth/sessions no backend).
+ *   Se false, apenas limpa a sessão local.
+ */
+export async function handleLogout(todasSessoes = false) {
+  const token = getToken();
+
+  // 1. Notifica o servidor para invalidar o JWT (blacklist/revogação)
+  if (token) {
+    const endpoint = todasSessoes ? "/auth/sessions" : "/auth/sessions/current";
+    await fetch(`${API_BASE}${endpoint}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }).catch(() => {}); // Falha silenciosa — o JWT expirará naturalmente
+  }
+
+  // 2. Limpa sessão local
   _limparToken();
+
+  // 3. Desautentica do Firebase
   await signOut(auth).catch(() => {});
+
+  // 4. Redireciona para login
   window.location.href = "/pages/login.html";
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-//  OBSERVADOR DE SESSÃO
+//  OBSERVADOR DE SESSÃO FIREBASE
 // ══════════════════════════════════════════════════════════════════════════════
 
 export function onSession(callback) {
@@ -645,7 +763,7 @@ export function onSession(callback) {
 export async function handleConvertAnonymous(dados) {
   const { email, senha } = dados;
 
-  const { EmailAuthProvider, linkWithCredential } =
+  const { linkWithCredential } =
     await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
 
   const currentUser = auth.currentUser;

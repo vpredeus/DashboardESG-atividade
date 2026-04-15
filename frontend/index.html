@@ -788,24 +788,29 @@
 
     <script src="./js/script.js"></script>
 
-    <script>
+    <script type="module">
       /* ══════════════════════════════════════════
-   BOTÃO DE PERFIL — Redirecionamento Direto
-   ══════════════════════════════════════════ */
-      function abrirPerfil() {
-        const isLogado = localStorage.getItem("esg_user_logged") === "true";
-        if (isLogado) {
+         AUTH — lê JWT da sessionStorage (nunca localStorage)
+         Compatível com a filosofia do auth.js
+      ══════════════════════════════════════════ */
+      import { isLoggedIn, getUserRole } from "./js/auth.js";
+
+      /* ── Botão de perfil ───────────────────────────────────────── */
+      window.abrirPerfil = function () {
+        if (isLoggedIn()) {
           window.location.href = "./html/profile.html";
         } else {
           window.location.href = "./html/login.html";
         }
-      }
+      };
 
       /* ══════════════════════════════════════════
          CONTROLE DE ACESSO — upload CSV só para admin
+         Lê a role diretamente do payload do JWT (sessionStorage),
+         nunca do localStorage — consistente com auth.js
       ══════════════════════════════════════════ */
       (function initCsvAccess() {
-        const role = localStorage.getItem("esg_user_role");
+        const role = getUserRole(); // "admin" | "user" | null
         if (role !== "admin") {
           var uploadInline = document.querySelector(".upload-inline-section");
           var novoCsvBanner = document.querySelector(".novo-csv-banner");
