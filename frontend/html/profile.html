@@ -46,7 +46,16 @@
           <span class="nav-profile-label">Perfil</span>
         </a>
       </nav>
-      <div class="menu-btn" onclick="toggleMenu()">☰</div>
+      <button
+        type="button"
+        class="menu-btn"
+        onclick="toggleMenu()"
+        aria-label="Abrir menu"
+        aria-controls="menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
     </header>
 
     <!-- ── LAYOUT PERFIL ── -->
@@ -914,11 +923,108 @@
       }
 
       function toggleMenu() {
-        const nav = document.getElementById("menu");
-        nav.classList.toggle("open");
+        var nav = document.getElementById("menu");
+        var btn = document.querySelector(".menu-btn");
+        var isOpen = nav.classList.toggle("open");
+        if (btn) btn.setAttribute("aria-expanded", isOpen);
       }
 
       /* ── Input has-value para overlay de fill ── */
+      /* ══════════════════════════════════════════
+         CARREGAR DADOS DO USUÁRIO (localStorage + sessionStorage)
+      ══════════════════════════════════════════ */
+      (function loadProfileData() {
+        const role = localStorage.getItem("esg_user_role") || "user";
+        const email = localStorage.getItem("esg_user_email") || "";
+        const nome = localStorage.getItem("esg_user_nome") || "";
+        const photo = localStorage.getItem("esg_user_photo") || null;
+        const isSocial = !!photo; // conta social sempre tem foto
+
+        // Monta nome de exibição
+        let displayName = nome || email.split("@")[0] || "Usuário";
+        let firstName = displayName.split(" ")[0];
+        let lastName = displayName.split(" ").slice(1).join(" ");
+
+        // ── Sidebar ──────────────────────────────────────
+        const sidebarNameEl = document.getElementById("sidebarName");
+        if (sidebarNameEl) sidebarNameEl.textContent = displayName;
+
+        const sidebarEmailEl = document.getElementById("sidebarEmail");
+        if (sidebarEmailEl) sidebarEmailEl.textContent = email;
+
+        // Badge de role
+        const badge = document.getElementById("sidebarRole");
+        if (badge) {
+          if (role === "admin") {
+            badge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Admin';
+            badge.className = "profile-role-badge admin";
+          } else {
+            badge.innerHTML = '<i class="fa-solid fa-user"></i> Usuário';
+            badge.className = "profile-role-badge user";
+          }
+        }
+
+        // ── Foto de perfil (login social) ────────────────
+        if (photo) {
+          const avatarEl = document.getElementById("profileAvatarDisplay");
+          if (avatarEl) {
+            avatarEl.innerHTML = `<img src="${photo}" alt="Avatar"
+              style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
+          }
+        }
+
+        // ── Preenche formulário de dados pessoais ────────
+        const nomeInput = document.getElementById("pf-nome");
+        const sobreInput = document.getElementById("pf-sobrenome");
+        const emailInput = document.getElementById("pf-email");
+
+        if (nomeInput && firstName) {
+          nomeInput.value = firstName;
+        }
+        if (sobreInput && lastName) {
+          sobreInput.value = lastName;
+        }
+        if (emailInput && email) {
+          emailInput.value = email;
+        }
+
+        // Login social: email somente leitura (não pode alterar pelo NestJS diretamente)
+        if (isSocial && emailInput) {
+          emailInput.readOnly = true;
+          emailInput.title =
+            "E-mail vinculado à conta social — não pode ser alterado aqui.";
+          emailInput.style.opacity = "0.6";
+          emailInput.style.cursor = "not-allowed";
+        }
+
+        // ── Seção de segurança: esconde troca de senha para login social ──
+        if (isSocial) {
+          const secSenha = document.querySelector(
+            "#section-seguranca .profile-form-grid",
+          );
+          const btnSenha = document.querySelector(
+            "#section-seguranca .btn-profile-save",
+          );
+          if (secSenha)
+            secSenha.insertAdjacentHTML(
+              "beforebegin",
+              `<div class="profile-section-desc" style="color:rgba(255,215,0,0.7);margin-bottom:16px;">
+              <i class="fa-solid fa-circle-info"></i>
+              Sua conta usa login social. A senha é gerenciada pelo provedor (Google/GitHub/LinkedIn).
+             </div>`,
+            );
+          if (secSenha) secSenha.style.display = "none";
+          if (btnSenha) btnSenha.style.display = "none";
+        }
+
+        // Trigger has-value para ícones de campo
+        document.querySelectorAll(".form-input").forEach((inp) => {
+          inp
+            .closest(".input-wrap")
+            ?.classList.toggle("has-value", inp.value.length > 0);
+        });
+      })();
+
       document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".form-input").forEach((input) => {
           const check = () => {

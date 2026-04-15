@@ -37,9 +37,38 @@ const auth = getAuth(app);
 
 // ── Helpers de token ──────────────────────────────────────────────────────────
 
+/** Decodifica o payload do JWT sem verificar assinatura (uso apenas no cliente). */
+function _parseJwt(token) {
+  try {
+    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(base64));
+  } catch (_) {
+    return {};
+  }
+}
+
 function _salvarToken(token) {
   try {
     sessionStorage.setItem("esg_jwt", token);
+  } catch (_) {}
+
+  // Persiste dados do usuário no localStorage para acesso entre páginas
+  const payload = _parseJwt(token);
+  try {
+    if (payload.role) localStorage.setItem("esg_user_role", payload.role);
+    if (payload.email) localStorage.setItem("esg_user_email", payload.email);
+    if (payload.sub) localStorage.setItem("esg_user_id", String(payload.sub));
+    localStorage.setItem("esg_user_logged", "true");
+  } catch (_) {}
+}
+
+/** Salva nome e foto vindos do Firebase (login social). */
+export function salvarDadosSocial(firebaseUser) {
+  try {
+    if (firebaseUser.displayName)
+      localStorage.setItem("esg_user_nome", firebaseUser.displayName);
+    if (firebaseUser.photoURL)
+      localStorage.setItem("esg_user_photo", firebaseUser.photoURL);
   } catch (_) {}
 }
 
@@ -51,9 +80,28 @@ export function getToken() {
   }
 }
 
+/** Role do usuário logado: "admin" | "user" | null */
+export function getUserRole() {
+  try {
+    return localStorage.getItem("esg_user_role");
+  } catch (_) {
+    return null;
+  }
+}
+
 function _limparToken() {
   try {
     sessionStorage.removeItem("esg_jwt");
+  } catch (_) {}
+  try {
+    [
+      "esg_user_logged",
+      "esg_user_role",
+      "esg_user_email",
+      "esg_user_id",
+      "esg_user_nome",
+      "esg_user_photo",
+    ].forEach((k) => localStorage.removeItem(k));
   } catch (_) {}
 }
 
@@ -405,6 +453,7 @@ export async function handleGoogleLogin() {
     throw err;
   }
 
+  salvarDadosSocial(result.user);
   return await _socialLoginNestJS(result.user, "google");
 }
 
@@ -423,6 +472,7 @@ export async function handleGithubLogin() {
     throw err;
   }
 
+  salvarDadosSocial(result.user);
   return await _socialLoginNestJS(result.user, "github");
 }
 

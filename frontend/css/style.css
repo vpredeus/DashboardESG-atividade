@@ -5176,11 +5176,11 @@ svg {
     padding: 12px 0 16px;
     gap: 4px;
     order: 3;
-    animation: menuSlideDown 0.22s ease both;
   }
 
   nav#menu.open {
     display: flex;
+    animation: menuSlideDown 0.22s ease both;
   }
 
   @keyframes menuSlideDown {

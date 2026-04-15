@@ -794,18 +794,30 @@
    ══════════════════════════════════════════ */
       function abrirPerfil() {
         const isLogado = localStorage.getItem("esg_user_logged") === "true";
-
         if (isLogado) {
-          // Redireciona direto para o perfil se estiver logado
           window.location.href = "./html/profile.html";
         } else {
-          // Redireciona direto para o login se não estiver logado
           window.location.href = "./html/login.html";
         }
       }
 
       /* ══════════════════════════════════════════
+         CONTROLE DE ACESSO — upload CSV só para admin
+      ══════════════════════════════════════════ */
+      (function initCsvAccess() {
+        const role = localStorage.getItem("esg_user_role");
+        if (role !== "admin") {
+          var uploadInline = document.querySelector(".upload-inline-section");
+          var novoCsvBanner = document.querySelector(".novo-csv-banner");
+          if (uploadInline) uploadInline.style.display = "none";
+          if (novoCsvBanner) novoCsvBanner.style.display = "none";
+        }
+      })();
+
+      /* ══════════════════════════════════════════
          MENU MOBILE — hamburger toggle
+         FIX: header precisa de flex-wrap para o nav
+         descer para a segunda linha no mobile.
       ══════════════════════════════════════════ */
       function toggleMenu() {
         var nav = document.getElementById("menu");
