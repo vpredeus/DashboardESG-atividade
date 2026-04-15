@@ -65,7 +65,7 @@ function _capitalizarLabel(str) {
 
 // ── Utilitários ───────────────────────────────────────────────────
 function toggleMenu() {
-  document.getElementById("menu").classList.toggle("active");
+  document.getElementById("menu").classList.toggle("open");
 }
 
 function exportCSV(chartId, filename) {
@@ -2210,7 +2210,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("nav a").forEach((a) =>
     a.addEventListener("click", () => {
       const m = document.getElementById("menu");
-      if (m) m.classList.remove("active");
+      if (m) m.classList.remove("open");
     }),
   );
 
@@ -2284,3 +2284,27 @@ function _initInputFillAnimation() {
     });
   });
 }
+
+// <script type="module">
+//   // Import the functions you need from the SDKs you need
+//   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+//   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
+//   // TODO: Add SDKs for Firebase products that you want to use
+//   // https://firebase.google.com/docs/web/setup#available-libraries
+
+//   // Your web app's Firebase configuration
+//   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+//   const firebaseConfig = {
+//     apiKey: "AIzaSyANdJd1Y8T7MGzazUz2-I7CS2IzHgyvz08",
+//     authDomain: "dashboard-esg-3aaff.firebaseapp.com",
+//     projectId: "dashboard-esg-3aaff",
+//     storageBucket: "dashboard-esg-3aaff.firebasestorage.app",
+//     messagingSenderId: "135866671836",
+//     appId: "1:135866671836:web:f14e7aadef2e433760ca19",
+//     measurementId: "G-6CSNZSP5NN"
+//   };
+
+//   // Initialize Firebase
+//   const app = initializeApp(firebaseConfig);
+//   const analytics = getAnalytics(app);
+// </script>

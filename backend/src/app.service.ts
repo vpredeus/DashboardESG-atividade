@@ -4,9 +4,10 @@ import {
   InternalServerErrorException,
 } from "@nestjs/common";
 import { PrismaService } from "./prisma/prisma.service";
-import { Prisma, desafios as Desafio } from "@prisma/client";
+import { Prisma, Desafios as Desafio } from "@prisma/client"; // ✅ "Desafios" com D maiúsculo
 
-export type DesafioInput = Omit<Prisma.desafiosCreateInput, "postado"> & {
+export type DesafioInput = Omit<Prisma.DesafiosCreateInput, "postado"> & {
+  // ✅
   postado?: string | Date | null;
 };
 
@@ -96,7 +97,8 @@ export class AppService {
         return Number.isFinite(n) ? Math.round(n) : null;
       };
 
-      const data: Prisma.desafiosCreateInput = {
+      const data: Prisma.DesafiosCreateInput = {
+        // ✅
         postado: postadoDate,
         tipo: desafio.tipo ?? null,
         empresa: desafio.empresa ?? null,
@@ -152,7 +154,8 @@ export class AppService {
     const norm = (v: unknown) =>
       v === undefined || v === null || v === "" ? null : v;
 
-    const where: Prisma.desafiosWhereInput = {
+    const where: Prisma.DesafiosWhereInput = {
+      // ✅
       postado: postadoDate ?? null,
       tipo: norm(desafio.tipo) as string | null,
       empresa: norm(desafio.empresa) as string | null,

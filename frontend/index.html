@@ -244,6 +244,7 @@
     </style>
   </head>
   <body>
+    <!-- ── SILEO TOAST 
     <!-- ── HEADER ── -->
     <header>
       <a href="../index.html" class="">
@@ -256,16 +257,27 @@
         <a href="index.html" class="active">Projetos &amp; Dashboard</a>
         <a href="./html/impactos.html">Impactos e Valores</a>
         <a href="./html/quem-somos.html">Quem Somos</a>
-        <a
-          href="./html/login.html"
+        <button
+          type="button"
           class="nav-profile-btn"
-          title="Perfil / Entrar"
+          title="Meu Perfil"
+          onclick="abrirPerfil()"
+          aria-label="Abrir perfil"
         >
           <i class="fa-solid fa-circle-user"></i>
           <span class="nav-profile-label">Perfil</span>
-        </a>
+        </button>
       </nav>
-      <div class="menu-btn" onclick="toggleMenu()">☰</div>
+      <button
+        type="button"
+        class="menu-btn"
+        onclick="toggleMenu()"
+        aria-label="Abrir menu"
+        aria-controls="menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
     </header>
 
     <!-- ── HERO ── -->
@@ -775,5 +787,42 @@
     </script>
 
     <script src="./js/script.js"></script>
+
+    <script>
+      /* ══════════════════════════════════════════
+   BOTÃO DE PERFIL — Redirecionamento Direto
+   ══════════════════════════════════════════ */
+      function abrirPerfil() {
+        const isLogado = localStorage.getItem("esg_user_logged") === "true";
+
+        if (isLogado) {
+          // Redireciona direto para o perfil se estiver logado
+          window.location.href = "./html/profile.html";
+        } else {
+          // Redireciona direto para o login se não estiver logado
+          window.location.href = "./html/login.html";
+        }
+      }
+
+      /* ══════════════════════════════════════════
+         MENU MOBILE — hamburger toggle
+      ══════════════════════════════════════════ */
+      function toggleMenu() {
+        var nav = document.getElementById("menu");
+        var btn = document.querySelector(".menu-btn");
+        var isOpen = nav.classList.toggle("open");
+        if (btn) btn.setAttribute("aria-expanded", isOpen);
+      }
+
+      /* Fecha menu ao clicar fora */
+      document.addEventListener("click", function (e) {
+        var nav = document.getElementById("menu");
+        var btn = document.querySelector(".menu-btn");
+        if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+          nav.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+        }
+      });
+    </script>
   </body>
 </html>

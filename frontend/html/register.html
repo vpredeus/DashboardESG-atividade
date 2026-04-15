@@ -60,7 +60,7 @@
           </div>
 
           <!-- Register form -->
-          <form onsubmit="handleRegister(event)">
+          <form onsubmit="handleRegisterForm(event)">
             <div class="form-row">
               <div class="form-group">
                 <label for="firstName">Nome</label>
@@ -389,8 +389,13 @@
          Step 2 → só para admin: campo de senha de validação.
          Destino final de ambos: ../index.html
     ═══════════════════════════════════════════════════════════ -->
-    <div class="access-modal-overlay" id="accessModal" role="dialog" aria-modal="true" aria-labelledby="accessModalTitle">
-
+    <div
+      class="access-modal-overlay"
+      id="accessModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="accessModalTitle"
+    >
       <!-- Loading animado ao fundo do overlay -->
       <div class="access-modal-bg-loader" aria-hidden="true">
         <i class="fa-solid fa-hourglass"></i>
@@ -398,7 +403,6 @@
 
       <!-- Card do modal -->
       <div class="access-modal-card">
-
         <!-- ── STEP 1: escolha de perfil ── -->
         <div id="accessStep1">
           <div class="access-modal-header">
@@ -406,12 +410,22 @@
               <i class="fa-solid fa-user-shield"></i>
             </div>
             <h3 id="accessModalTitle">Tipo de acesso</h3>
-            <p>Selecione o perfil que corresponde à sua função na plataforma ENIAC ESG HUB.</p>
+            <p>
+              Selecione o perfil que corresponde à sua função na plataforma
+              ENIAC ESG HUB.
+            </p>
           </div>
 
           <div class="access-options">
             <!-- Empresa / Admin -->
-            <div class="access-option-card" id="optEmpresa" onclick="selectAccessType('empresa')" role="button" tabindex="0" aria-pressed="false">
+            <div
+              class="access-option-card"
+              id="optEmpresa"
+              onclick="selectAccessType('empresa')"
+              role="button"
+              tabindex="0"
+              aria-pressed="false"
+            >
               <div class="access-option-icon empresa">
                 <i class="fa-solid fa-building"></i>
               </div>
@@ -419,11 +433,20 @@
                 <div class="access-option-label">Acesso</div>
                 <div class="access-option-title">Empresa</div>
               </div>
-              <div class="access-option-desc">Gestão completa, importação de dados e configurações avançadas.</div>
+              <div class="access-option-desc">
+                Gestão completa, importação de dados e configurações avançadas.
+              </div>
             </div>
 
             <!-- Usuário regular -->
-            <div class="access-option-card" id="optUsuario" onclick="selectAccessType('usuario')" role="button" tabindex="0" aria-pressed="false">
+            <div
+              class="access-option-card"
+              id="optUsuario"
+              onclick="selectAccessType('usuario')"
+              role="button"
+              tabindex="0"
+              aria-pressed="false"
+            >
               <div class="access-option-icon usuario">
                 <i class="fa-solid fa-user"></i>
               </div>
@@ -431,29 +454,45 @@
                 <div class="access-option-label">Acesso</div>
                 <div class="access-option-title">Usuário</div>
               </div>
-              <div class="access-option-desc">Visualização de dashboards e acompanhamento dos projetos ESG.</div>
+              <div class="access-option-desc">
+                Visualização de dashboards e acompanhamento dos projetos ESG.
+              </div>
             </div>
           </div>
 
-          <button class="access-confirm-btn" id="accessConfirmBtn" onclick="confirmAccessType()" disabled>
+          <button
+            class="access-confirm-btn"
+            id="accessConfirmBtn"
+            onclick="confirmAccessType()"
+            disabled
+          >
             <i class="fa-solid fa-arrow-right"></i>
             Continuar
           </button>
 
           <div class="access-modal-footer">
-            Sua escolha define as permissões iniciais da conta.<br>
+            Sua escolha define as permissões iniciais da conta.<br />
             O administrador pode alterá-las posteriormente.
           </div>
         </div>
 
         <!-- ── STEP 2: validação de senha admin (só para Empresa) ── -->
-        <div id="accessStep2" style="display:none;">
+        <div id="accessStep2" style="display: none">
           <div class="access-modal-header">
-            <div class="access-modal-icon" style="background:rgba(255,215,0,0.15); border-color:rgba(255,215,0,0.35);">
+            <div
+              class="access-modal-icon"
+              style="
+                background: rgba(255, 215, 0, 0.15);
+                border-color: rgba(255, 215, 0, 0.35);
+              "
+            >
               <i class="fa-solid fa-key"></i>
             </div>
             <h3>Validação de administrador</h3>
-            <p>Insira a senha de acesso corporativo para confirmar o perfil <strong style="color:var(--eniac-amarelo);">Empresa</strong>.</p>
+            <p>
+              Insira a senha de acesso corporativo para confirmar o perfil
+              <strong style="color: var(--eniac-amarelo)">Empresa</strong>.
+            </p>
           </div>
 
           <button class="access-back-btn" onclick="goBackToStep1()">
@@ -462,7 +501,7 @@
           </button>
 
           <div class="access-admin-hint">
-            Esta senha é fornecida pelo gestor da conta institucional.<br>
+            Esta senha é fornecida pelo gestor da conta institucional.<br />
             <strong>Não é a senha do seu perfil pessoal.</strong>
           </div>
 
@@ -477,7 +516,11 @@
                 placeholder="••••••••"
                 oninput="clearAdminError()"
               />
-              <button type="button" class="toggle-pw" onclick="togglePw('adminPassword', this)">
+              <button
+                type="button"
+                class="toggle-pw"
+                onclick="togglePw('adminPassword', this)"
+              >
                 <i class="fa-regular fa-eye"></i>
               </button>
             </div>
@@ -487,7 +530,11 @@
             </div>
           </div>
 
-          <button class="access-confirm-btn" id="adminConfirmBtn" onclick="confirmAdmin()">
+          <button
+            class="access-confirm-btn"
+            id="adminConfirmBtn"
+            onclick="confirmAdmin()"
+          >
             <i class="fa-solid fa-shield-check"></i>
             Confirmar acesso Empresa
           </button>
@@ -496,9 +543,10 @@
             Dificuldades? Entre em contato com o administrador da instituição.
           </div>
         </div>
-
-      </div><!-- fim .access-modal-card -->
-    </div><!-- fim .access-modal-overlay -->
+      </div>
+      <!-- fim .access-modal-card -->
+    </div>
+    <!-- fim .access-modal-overlay -->
 
     <script>
       /* ── Utilitários gerais ──────────────────────────────────── */
@@ -519,102 +567,95 @@
       }
 
       function checkStrength(val) {
-        const wrap  = document.getElementById("pwStrength");
-        const fill  = document.getElementById("pwFill");
+        const wrap = document.getElementById("pwStrength");
+        const fill = document.getElementById("pwFill");
         const label = document.getElementById("pwLabel");
         wrap.style.display = val.length ? "block" : "none";
         if (!val.length) return;
         let score = 0;
-        if (val.length >= 8)        score++;
-        if (/[A-Z]/.test(val))      score++;
-        if (/[0-9]/.test(val))      score++;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
         if (/[^A-Za-z0-9]/.test(val)) score++;
         const levels = [
-          { pct: "25%",  color: "#e74c3c", text: "Fraca"    },
-          { pct: "50%",  color: "#e67e22", text: "Razoável" },
-          { pct: "75%",  color: "#f1c40f", text: "Boa"      },
-          { pct: "100%", color: "#2ecc71", text: "Forte ✓"  },
+          { pct: "25%", color: "#e74c3c", text: "Fraca" },
+          { pct: "50%", color: "#e67e22", text: "Razoável" },
+          { pct: "75%", color: "#f1c40f", text: "Boa" },
+          { pct: "100%", color: "#2ecc71", text: "Forte ✓" },
         ];
         const lvl = levels[score - 1] || levels[0];
-        fill.style.width      = lvl.pct;
+        fill.style.width = lvl.pct;
         fill.style.background = lvl.color;
-        label.textContent     = `Força da senha: ${lvl.text}`;
-        label.style.color     = lvl.color;
+        label.textContent = `Força da senha: ${lvl.text}`;
+        label.style.color = lvl.color;
       }
 
-      /* ── Formulário de cadastro ─────────────────────────────────
-         Valida os campos e, se tudo OK, abre o modal de seleção
-         de tipo de acesso em vez de submeter direto ao backend.
-         A chamada real ao POST /auth/register será feita após a
-         escolha do perfil (dentro de finalizarCadastro). */
-      function handleRegister(e) {
+      /* ── Formulário ─────────────────────────────────────────── */
+      function handleRegisterForm(e) {
         e.preventDefault();
-        const pw  = document.getElementById("password").value;
+        const pw = document.getElementById("password").value;
         const cpw = document.getElementById("confirmPassword").value;
 
         if (pw !== cpw) {
-          /* Feedback visual sem alert nativo */
           const cpwInput = document.getElementById("confirmPassword");
           cpwInput.style.borderColor = "#e74c3c";
-          cpwInput.style.boxShadow   = "0 0 0 3px rgba(231,76,60,0.15)";
+          cpwInput.style.boxShadow = "0 0 0 3px rgba(231,76,60,0.15)";
           setTimeout(() => {
             cpwInput.style.borderColor = "";
-            cpwInput.style.boxShadow   = "";
+            cpwInput.style.boxShadow = "";
           }, 2000);
           return;
         }
 
-        /* Mostra loading no botão por 800ms antes do modal aparecer —
-           dá a sensação de que algo está sendo processado */
         const btn = e.target.querySelector(".btn-auth-submit");
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verificando...';
-        btn.disabled  = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i> Verificando...';
+        btn.disabled = true;
 
         setTimeout(() => {
-          btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Criar minha conta';
-          btn.disabled  = false;
+          btn.innerHTML =
+            '<i class="fa-solid fa-user-plus"></i> Criar minha conta';
+          btn.disabled = false;
           abrirModalAcesso();
         }, 800);
       }
 
       /* ── Modal de tipo de acesso ─────────────────────────────── */
-
-      /* Estado interno do modal */
-      let _selectedType = null; /* 'empresa' | 'usuario' */
+      let _selectedType = null;
 
       function abrirModalAcesso() {
         _selectedType = null;
-        /* Reseta visual */
         document.getElementById("optEmpresa").classList.remove("selected");
         document.getElementById("optUsuario").classList.remove("selected");
         document.getElementById("accessConfirmBtn").disabled = true;
-        /* Garante step 1 visível */
         document.getElementById("accessStep1").style.display = "block";
         document.getElementById("accessStep2").style.display = "none";
-        /* Abre overlay */
         document.getElementById("accessModal").classList.add("show");
         document.body.style.overflow = "hidden";
       }
 
       function selectAccessType(tipo) {
         _selectedType = tipo;
-        /* Atualiza visual dos cards */
-        document.getElementById("optEmpresa").classList.toggle("selected", tipo === "empresa");
-        document.getElementById("optEmpresa").setAttribute("aria-pressed", tipo === "empresa");
-        document.getElementById("optUsuario").classList.toggle("selected", tipo === "usuario");
-        document.getElementById("optUsuario").setAttribute("aria-pressed", tipo === "usuario");
-        /* Habilita botão de continuar */
+        document
+          .getElementById("optEmpresa")
+          .classList.toggle("selected", tipo === "empresa");
+        document
+          .getElementById("optEmpresa")
+          .setAttribute("aria-pressed", tipo === "empresa");
+        document
+          .getElementById("optUsuario")
+          .classList.toggle("selected", tipo === "usuario");
+        document
+          .getElementById("optUsuario")
+          .setAttribute("aria-pressed", tipo === "usuario");
         document.getElementById("accessConfirmBtn").disabled = false;
       }
 
       function confirmAccessType() {
         if (!_selectedType) return;
-
         if (_selectedType === "usuario") {
-          /* Usuário regular: finaliza direto */
           finalizarCadastro("usuario");
         } else {
-          /* Admin: exibe step 2 para validação de senha corporativa */
           document.getElementById("accessStep1").style.display = "none";
           document.getElementById("accessStep2").style.display = "block";
           document.getElementById("adminPassword").value = "";
@@ -631,11 +672,11 @@
       function clearAdminError() {
         document.getElementById("adminError").classList.remove("show");
         document.getElementById("adminPassword").style.borderColor = "";
-        document.getElementById("adminPassword").style.boxShadow   = "";
+        document.getElementById("adminPassword").style.boxShadow = "";
       }
 
       function confirmAdmin() {
-        const pw  = document.getElementById("adminPassword").value.trim();
+        const pw = document.getElementById("adminPassword").value.trim();
         const btn = document.getElementById("adminConfirmBtn");
 
         if (!pw) {
@@ -643,70 +684,13 @@
           return;
         }
 
-        /* Loading no botão de confirmação */
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Validando...';
-        btn.disabled  = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i> Validando...';
+        btn.disabled = true;
 
-        /* ── TODO: substituir pelo endpoint real de validação admin ──
-           Ex.: POST /auth/validate-admin-key  { adminKey: pw }
-           Resposta: { valid: true/false }
-           Por enquanto simula um placeholder de 1s. */
-        setTimeout(() => {
-          /* Senha placeholder para testes: "admin123" */
-          const ADMIN_KEY_PLACEHOLDER = "admin123";
-
-          if (pw === ADMIN_KEY_PLACEHOLDER) {
-            finalizarCadastro("empresa");
-          } else {
-            btn.innerHTML = '<i class="fa-solid fa-shield-check"></i> Confirmar acesso Empresa';
-            btn.disabled  = false;
-            const errEl   = document.getElementById("adminError");
-            errEl.classList.add("show");
-            const pwInput = document.getElementById("adminPassword");
-            pwInput.style.borderColor = "#e74c3c";
-            pwInput.style.boxShadow   = "0 0 0 3px rgba(231,76,60,0.15)";
-            pwInput.focus();
-          }
-        }, 1000);
-      }
-
-      /* Ponto de saída unificado — chamado por ambos os caminhos.
-         TODO: aqui você fará a chamada real ao POST /auth/register
-         passando o role ('empresa' → 'admin' | 'usuario' → 'user').
-         Após a resposta do backend, redireciona para index.html. */
-      function finalizarCadastro(role) {
-        const btn = document.querySelector(".access-confirm-btn:not([disabled])") ||
-                    document.getElementById("accessConfirmBtn");
-
-        /* Atualiza botão ativo para estado de loading */
-        const activeBtn = role === "empresa"
-          ? document.getElementById("adminConfirmBtn")
-          : document.getElementById("accessConfirmBtn");
-
-        activeBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Criando conta...';
-        activeBtn.disabled  = true;
-
-        /* ── TODO: POST /auth/register ──
-           fetch('../api/auth/register', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({
-               firstName: document.getElementById('firstName').value,
-               lastName:  document.getElementById('lastName').value,
-               email:     document.getElementById('email').value,
-               password:  document.getElementById('password').value,
-               role:      role === 'empresa' ? 'admin' : 'user'
-             })
-           })
-           .then(r => r.json())
-           .then(() => redirecionarParaIndex())
-           .catch(err => { ... });
-        */
-
-        /* Simulação: aguarda 1s e redireciona */
-        setTimeout(() => {
-          redirecionarParaIndex();
-        }, 1000);
+        // Valida o código corporativo enviando ao NestJS (não ao frontend)
+        // O NestJS compara com a variável de ambiente EMPRESA_ACCESS_CODE
+        finalizarCadastro("empresa", pw);
       }
 
       function redirecionarParaIndex() {
@@ -718,9 +702,9 @@
         }, 650);
       }
 
-      /* Tecla Enter nos cards de opção (acessibilidade) */
+      /* Tecla Enter nos cards */
       document.addEventListener("DOMContentLoaded", () => {
-        ["optEmpresa", "optUsuario"].forEach(id => {
+        ["optEmpresa", "optUsuario"].forEach((id) => {
           document.getElementById(id).addEventListener("keydown", (e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
@@ -729,26 +713,125 @@
           });
         });
 
-        /* Enter no campo de senha admin submete */
-        document.getElementById("adminPassword").addEventListener("keydown", (e) => {
-          if (e.key === "Enter") confirmAdmin();
-        });
+        document
+          .getElementById("adminPassword")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") confirmAdmin();
+          });
 
-        /* Transição de saída para links da nav */
+        /* Transições de saída */
         const container = document.getElementById("transition-container");
-        const links = document.querySelectorAll(
-          'a[href*="login.html"], a[href*="register.html"], a[href*="forgot-password.html"]'
-        );
-        links.forEach((link) => {
+        document.querySelectorAll('a[href*="login.html"]').forEach((link) => {
           link.addEventListener("click", (e) => {
             e.preventDefault();
-            const destination = link.href;
             container.classList.add("active");
             setTimeout(() => {
-              window.location.href = destination;
+              window.location.href = link.href;
             }, 650);
           });
         });
+      });
+    </script>
+
+    <!--
+  MÓDULO: integração real com auth.js
+  Substitui a função finalizarCadastro() placeholder por chamada real ao Firebase + NestJS
+-->
+    <script type="module">
+      import {
+        handleRegister,
+        handleGoogleLogin,
+        handleGithubLogin,
+        handleLinkedinLogin,
+      } from "../js/auth.js";
+
+      /**
+       * Chamada pelo confirmAccessType() (usuário) ou confirmAdmin() (empresa).
+       * Faz o registro real no Firebase + NestJS.
+       *
+       * @param {'usuario'|'empresa'} role
+       * @param {string} [codigoEmpresa]  - apenas para role='empresa'
+       */
+      window.finalizarCadastro = async function (role, codigoEmpresa) {
+        // Modo social: auth.js abriu o modal para capturar apenas o tipo.
+        // Não faz registro — apenas resolve a Promise pendente e fecha o modal.
+        if (window._modoSocialTipo) {
+          window._modoSocialTipo = false;
+          document.getElementById("accessModal")?.classList.remove("show");
+          document.body.style.overflow = "";
+          if (typeof window._resolverTipo === "function") {
+            window._resolverTipo(role, codigoEmpresa);
+            window._resolverTipo = null;
+          }
+          return;
+        }
+
+        const activeBtn =
+          role === "empresa"
+            ? document.getElementById("adminConfirmBtn")
+            : document.getElementById("accessConfirmBtn");
+
+        activeBtn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i> Criando conta...';
+        activeBtn.disabled = true;
+
+        const nome = document.getElementById("firstName").value.trim();
+        const sobrenome = document.getElementById("lastName").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const senha = document.getElementById("password").value;
+
+        try {
+          await handleRegister({
+            nome,
+            sobrenome,
+            email,
+            senha,
+            tipo: role,
+            codigoEmpresa,
+          });
+          redirecionarParaIndex();
+        } catch (err) {
+          // Erro já exibido pelo auth.js no #auth-error (ou toast)
+          activeBtn.innerHTML =
+            role === "empresa"
+              ? '<i class="fa-solid fa-shield-check"></i> Confirmar acesso Empresa'
+              : '<i class="fa-solid fa-arrow-right"></i> Continuar';
+          activeBtn.disabled = false;
+        }
+      };
+
+      /* ── Social login no register ─────────────────────────────── */
+      // Seleciona os botões pelo texto (já que register.html usa <a> em vez de <button>)
+      document.querySelectorAll(".social-btn").forEach((btn) => {
+        const text = btn.textContent.trim().toLowerCase();
+
+        if (text.includes("google")) {
+          btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+              await handleGoogleLogin();
+              window.location.href = "../index.html";
+            } catch (_) {}
+          });
+        }
+
+        if (text.includes("github")) {
+          btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+              await handleGithubLogin();
+              window.location.href = "../index.html";
+            } catch (_) {}
+          });
+        }
+
+        if (text.includes("linkedin")) {
+          btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            // Inicia o redirect OAuth — o retorno é tratado em linkedin-callback.html
+            handleLinkedinLogin();
+          });
+        }
       });
     </script>
 
