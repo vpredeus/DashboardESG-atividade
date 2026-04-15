@@ -1,0 +1,1505 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENIAC ESG – Meu Perfil</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" href="../images/esg_logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      body {
+        background: var(--bg-dark);
+        color: var(--branco);
+      }
+
+      /* ── Skeleton loader para os campos enquanto carrega ── */
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.05) 25%,
+          rgba(255, 255, 255, 0.1) 50%,
+          rgba(255, 255, 255, 0.05) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 8px;
+        color: transparent !important;
+        pointer-events: none;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ── Overlay de loading global (para ações assíncronas) ── */
+      .profile-loading-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(10, 14, 40, 0.75);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .profile-loading-overlay.show {
+        display: flex;
+      }
+      .profile-loading-overlay i {
+        font-size: 2rem;
+        color: #ffd700;
+        animation: spin 1s linear infinite;
+      }
+      .profile-loading-overlay span {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── Toast container (sileoToast) ── */
+      #sileoToastContainer {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 360px;
+      }
+      .sileo-toast {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #141c4a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 14px 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        animation: slideIn 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(120%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .sileo-toast.removing {
+        animation: slideOut 0.3s ease forwards;
+      }
+      @keyframes slideOut {
+        to {
+          transform: translateX(120%);
+          opacity: 0;
+        }
+      }
+      .sileo-toast.success {
+        border-color: rgba(46, 204, 113, 0.3);
+      }
+      .sileo-toast.error {
+        border-color: rgba(231, 76, 60, 0.3);
+      }
+      .sileo-toast.warning {
+        border-color: rgba(243, 156, 18, 0.3);
+      }
+      .sileo-toast.info {
+        border-color: rgba(52, 152, 219, 0.3);
+      }
+      .sileo-toast-icon-wrap {
+        font-size: 1.1rem;
+        padding-top: 1px;
+      }
+      .sileo-toast.success .sileo-toast-icon-wrap {
+        color: #2ecc71;
+      }
+      .sileo-toast.error .sileo-toast-icon-wrap {
+        color: #e74c3c;
+      }
+      .sileo-toast.warning .sileo-toast-icon-wrap {
+        color: #f39c12;
+      }
+      .sileo-toast.info .sileo-toast-icon-wrap {
+        color: #3498db;
+      }
+      .sileo-toast-body {
+        flex: 1;
+      }
+      .sileo-toast-title {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: #fff;
+      }
+      .sileo-toast-msg {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 3px;
+      }
+      .sileo-toast-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.85rem;
+        line-height: 1;
+      }
+      .sileo-toast-close:hover {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .sileo-toast-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: currentColor;
+        opacity: 0.4;
+        animation: shrink linear forwards;
+        width: 100%;
+      }
+      .sileo-toast.success .sileo-toast-progress {
+        color: #2ecc71;
+      }
+      .sileo-toast.error .sileo-toast-progress {
+        color: #e74c3c;
+      }
+      .sileo-toast.info .sileo-toast-progress {
+        color: #3498db;
+      }
+      .sileo-toast.warning .sileo-toast-progress {
+        color: #f39c12;
+      }
+      @keyframes shrink {
+        from {
+          width: 100%;
+        }
+        to {
+          width: 0;
+        }
+      }
+    </style>
+  </head>
+  <body class="auth-body">
+    <!-- ── Loading overlay global ── -->
+    <div class="profile-loading-overlay" id="profileLoadingOverlay">
+      <i class="fa-solid fa-circle-notch"></i>
+      <span id="profileLoadingMsg">Carregando…</span>
+    </div>
+
+    <!-- ── Toast container ── -->
+    <div id="sileoToastContainer"></div>
+
+    <!-- ── HEADER ── -->
+    <header>
+      <a class="logo" href="../index.html">
+        <span class="logo-mark">⬡</span>
+        ENIAC <span class="logo-accent">ESG HUB</span>
+      </a>
+      <nav id="menu">
+        <a href="../index.html">Projetos &amp; Dashboard</a>
+        <a href="./impactos.html">Impactos e Valores</a>
+        <a href="./quem-somos.html">Quem Somos</a>
+        <a
+          href="./profile.html"
+          class="nav-profile-btn active"
+          title="Meu Perfil"
+        >
+          <i class="fa-solid fa-circle-user"></i>
+          <span class="nav-profile-label">Perfil</span>
+        </a>
+      </nav>
+      <button
+        type="button"
+        class="menu-btn"
+        onclick="toggleMenu()"
+        aria-label="Abrir menu"
+        aria-controls="menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+    </header>
+
+    <!-- ── LAYOUT PERFIL ── -->
+    <div class="profile-page">
+      <!-- ════════════ SIDEBAR ════════════ -->
+      <aside class="profile-sidebar">
+        <div class="profile-avatar-card">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="profileAvatarDisplay">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <button
+              class="profile-avatar-edit-btn"
+              onclick="triggerAvatarUpload()"
+              title="Alterar foto"
+            >
+              <i class="fa-solid fa-camera"></i>
+            </button>
+            <input
+              type="file"
+              id="avatarInput"
+              accept="image/*"
+              style="display: none"
+              onchange="handleAvatarChange(event)"
+            />
+          </div>
+          <div
+            class="profile-name skeleton"
+            id="sidebarName"
+            style="min-width: 120px; height: 1.2em"
+          >
+            ​
+          </div>
+          <div
+            class="profile-role-badge"
+            id="sidebarRole"
+            style="min-width: 60px; height: 1em"
+          >
+            ​
+          </div>
+          <div
+            class="profile-email-small skeleton"
+            id="sidebarEmail"
+            style="min-width: 150px; height: 0.9em"
+          >
+            ​
+          </div>
+
+          <div class="profile-stats-mini">
+            <div class="profile-stat-mini">
+              <span
+                class="profile-stat-mini-num skeleton"
+                id="statUploads"
+                style="min-width: 28px"
+                >—</span
+              >
+              <span class="profile-stat-mini-label">Uploads</span>
+            </div>
+            <div class="profile-stat-mini">
+              <span
+                class="profile-stat-mini-num skeleton"
+                id="statMeses"
+                style="min-width: 28px"
+                >—</span
+              >
+              <span class="profile-stat-mini-label">Meses</span>
+            </div>
+            <div class="profile-stat-mini">
+              <span
+                class="profile-stat-mini-num skeleton"
+                id="statAtivo"
+                style="min-width: 36px"
+                >—</span
+              >
+              <span class="profile-stat-mini-label">Ativo</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="profile-nav">
+          <button
+            class="profile-nav-item active"
+            onclick="showSection('dados', this)"
+          >
+            <i class="fa-solid fa-id-card"></i> Dados Pessoais
+          </button>
+          <button
+            class="profile-nav-item"
+            onclick="showSection('seguranca', this)"
+          >
+            <i class="fa-solid fa-lock"></i> Segurança
+          </button>
+          <button
+            class="profile-nav-item"
+            onclick="showSection('preferencias', this)"
+          >
+            <i class="fa-solid fa-sliders"></i> Preferências
+          </button>
+          <button
+            class="profile-nav-item"
+            onclick="showSection('atividade', this)"
+          >
+            <i class="fa-solid fa-clock-rotate-left"></i> Atividade
+          </button>
+          <div class="profile-nav-divider"></div>
+          <button class="profile-nav-item danger" onclick="confirmarLogout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
+          </button>
+        </nav>
+      </aside>
+
+      <!-- ════════════ PAINEL PRINCIPAL ════════════ -->
+      <main class="profile-main">
+        <!-- ── SEÇÃO: Dados Pessoais ── -->
+        <div class="profile-section-card" id="section-dados">
+          <h3 class="profile-section-title">
+            <i class="fa-solid fa-id-card"></i> Dados Pessoais
+          </h3>
+          <p class="profile-section-desc">
+            Informações básicas da sua conta. Mantenha os dados atualizados para
+            que sua identidade seja reconhecida corretamente no sistema.
+          </p>
+
+          <div class="profile-form-grid">
+            <div class="profile-field">
+              <label for="pf-nome">Nome</label>
+              <div class="input-wrap">
+                <i class="fa-regular fa-user field-icon"></i>
+                <input
+                  type="text"
+                  id="pf-nome"
+                  class="form-input"
+                  placeholder="João"
+                  oninput="markChanged()"
+                />
+              </div>
+            </div>
+            <div class="profile-field">
+              <label for="pf-sobrenome">Sobrenome</label>
+              <div class="input-wrap">
+                <i class="fa-regular fa-user field-icon"></i>
+                <input
+                  type="text"
+                  id="pf-sobrenome"
+                  class="form-input"
+                  placeholder="Silva"
+                  oninput="markChanged()"
+                />
+              </div>
+            </div>
+            <div class="profile-field">
+              <label for="pf-email">E-mail</label>
+              <div class="input-wrap">
+                <i class="fa-regular fa-envelope field-icon"></i>
+                <input
+                  type="email"
+                  id="pf-email"
+                  class="form-input"
+                  placeholder="seu@eniac.edu.br"
+                  oninput="markChanged()"
+                />
+              </div>
+            </div>
+            <div class="profile-field">
+              <label for="pf-telefone">Telefone</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-phone field-icon"></i>
+                <input
+                  type="tel"
+                  id="pf-telefone"
+                  class="form-input"
+                  placeholder="(11) 99999-9999"
+                  oninput="markChanged()"
+                />
+              </div>
+            </div>
+            <div class="profile-field">
+              <label for="pf-cargo">Cargo / Função</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-briefcase field-icon"></i>
+                <input
+                  type="text"
+                  id="pf-cargo"
+                  class="form-input"
+                  placeholder="Ex: Analista ESG"
+                  oninput="markChanged()"
+                />
+              </div>
+            </div>
+            <div class="profile-field">
+              <label for="pf-departamento">Departamento</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-building field-icon"></i>
+                <input
+                  type="text"
+                  id="pf-departamento"
+                  class="form-input"
+                  placeholder="Ex: Sustentabilidade"
+                  oninput="markChanged()"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-section-divider"></div>
+
+          <div class="profile-form-grid full">
+            <div class="profile-field">
+              <label for="pf-bio">Bio / Apresentação</label>
+              <div
+                class="input-wrap"
+                style="overflow: visible; border-radius: 12px"
+              >
+                <textarea
+                  id="pf-bio"
+                  class="form-input"
+                  rows="3"
+                  placeholder="Conte um pouco sobre você e seu papel no sistema ESG..."
+                  style="
+                    padding-top: 13px;
+                    padding-left: 42px;
+                    resize: vertical;
+                    min-height: 80px;
+                  "
+                  oninput="markChanged()"
+                ></textarea>
+                <i
+                  class="fa-regular fa-pen-to-square field-icon"
+                  style="top: 18px"
+                ></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-actions" id="dadosActions" style="display: none">
+            <button class="btn-profile-save" onclick="salvarDados()">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar alterações
+            </button>
+            <button class="btn-profile-cancel" onclick="cancelarEdicao()">
+              <i class="fa-solid fa-xmark"></i> Cancelar
+            </button>
+          </div>
+        </div>
+
+        <!-- ── SEÇÃO: Segurança ── -->
+        <div
+          class="profile-section-card"
+          id="section-seguranca"
+          style="display: none"
+        >
+          <h3 class="profile-section-title">
+            <i class="fa-solid fa-lock"></i> Segurança
+          </h3>
+          <p class="profile-section-desc">
+            Altere sua senha periodicamente para manter sua conta protegida.
+          </p>
+
+          <div id="secSenhaWrap">
+            <div class="profile-form-grid full">
+              <div class="profile-field">
+                <label for="pf-senha-atual">Senha atual</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-lock field-icon"></i>
+                  <input
+                    type="password"
+                    id="pf-senha-atual"
+                    class="form-input has-toggle"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-pw"
+                    onclick="togglePw('pf-senha-atual', this)"
+                  >
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="profile-field">
+                <label for="pf-nova-senha">Nova senha</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-key field-icon"></i>
+                  <input
+                    type="password"
+                    id="pf-nova-senha"
+                    class="form-input has-toggle"
+                    placeholder="Mínimo 8 caracteres"
+                    oninput="checkStrengthProfile(this.value)"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-pw"
+                    onclick="togglePw('pf-nova-senha', this)"
+                  >
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
+                <div
+                  class="pw-strength"
+                  id="pwStrengthProfile"
+                  style="display: block"
+                >
+                  <div class="pw-strength-bar">
+                    <div class="pw-strength-fill" id="pwFillProfile"></div>
+                  </div>
+                  <span class="pw-strength-label" id="pwLabelProfile"
+                    >Digite uma nova senha</span
+                  >
+                </div>
+              </div>
+              <div class="profile-field">
+                <label for="pf-confirmar-senha">Confirmar nova senha</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-shield-halved field-icon"></i>
+                  <input
+                    type="password"
+                    id="pf-confirmar-senha"
+                    class="form-input has-toggle"
+                    placeholder="Repita a nova senha"
+                  />
+                  <button
+                    type="button"
+                    class="toggle-pw"
+                    onclick="togglePw('pf-confirmar-senha', this)"
+                  >
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-actions" style="margin-top: 8px">
+              <button
+                class="btn-profile-save"
+                id="btnSalvarSenha"
+                onclick="salvarSenha()"
+              >
+                <i class="fa-solid fa-shield-check"></i> Atualizar senha
+              </button>
+            </div>
+          </div>
+
+          <div class="profile-section-divider"></div>
+          <h4
+            class="profile-section-title"
+            style="font-size: 0.88rem; margin-bottom: 4px"
+          >
+            <i class="fa-solid fa-desktop"></i> Sessões ativas
+          </h4>
+          <p class="profile-section-desc" style="margin-bottom: 16px">
+            Sessões abertas na sua conta. A sessão atual é preservada ao
+            encerrar as demais.
+          </p>
+          <div class="profile-activity-item">
+            <div class="activity-icon view">
+              <i class="fa-solid fa-laptop"></i>
+            </div>
+            <div class="activity-text">
+              <div class="activity-title">Sessão atual — navegador</div>
+              <div class="activity-time" id="sessaoAtualInfo">Carregando…</div>
+            </div>
+          </div>
+          <div style="margin-top: 14px">
+            <button
+              class="btn-danger"
+              id="btnEncerrarSessoes"
+              onclick="encerrarOutrasSessoes()"
+            >
+              <i class="fa-solid fa-right-from-bracket"></i> Encerrar outras
+              sessões
+            </button>
+          </div>
+        </div>
+
+        <!-- ── SEÇÃO: Preferências ── -->
+        <div
+          class="profile-section-card"
+          id="section-preferencias"
+          style="display: none"
+        >
+          <h3 class="profile-section-title">
+            <i class="fa-solid fa-sliders"></i> Preferências
+          </h3>
+          <p class="profile-section-desc">
+            Personalize a experiência no dashboard de acordo com o seu fluxo de
+            trabalho.
+          </p>
+
+          <div class="profile-pref-row">
+            <div class="pref-info">
+              <div class="pref-label">Notificações de upload</div>
+              <div class="pref-desc">
+                Receber alerta ao concluir importação de CSV
+              </div>
+            </div>
+            <label class="pref-toggle">
+              <input
+                type="checkbox"
+                id="pref-notif-upload"
+                onchange="salvarPreferencia('notif_upload', this.checked)"
+              />
+              <span class="pref-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="profile-pref-row">
+            <div class="pref-info">
+              <div class="pref-label">Animações de gráficos</div>
+              <div class="pref-desc">
+                Exibir animação ao carregar os dashboards
+              </div>
+            </div>
+            <label class="pref-toggle">
+              <input
+                type="checkbox"
+                id="pref-chart-anim"
+                onchange="salvarPreferencia('chart_anim', this.checked)"
+              />
+              <span class="pref-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="profile-pref-row">
+            <div class="pref-info">
+              <div class="pref-label">Modo compacto</div>
+              <div class="pref-desc">
+                Reduzir espaçamento nos cards de projetos
+              </div>
+            </div>
+            <label class="pref-toggle">
+              <input
+                type="checkbox"
+                id="pref-compact-mode"
+                onchange="salvarPreferencia('compact_mode', this.checked)"
+              />
+              <span class="pref-toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="profile-pref-row">
+            <div class="pref-info">
+              <div class="pref-label">E-mail de relatório semanal</div>
+              <div class="pref-desc">
+                Receber resumo de métricas toda segunda-feira
+              </div>
+            </div>
+            <label class="pref-toggle">
+              <input
+                type="checkbox"
+                id="pref-weekly-email"
+                onchange="salvarPreferencia('weekly_email', this.checked)"
+              />
+              <span class="pref-toggle-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ── SEÇÃO: Atividade ── -->
+        <div
+          class="profile-section-card"
+          id="section-atividade"
+          style="display: none"
+        >
+          <h3 class="profile-section-title">
+            <i class="fa-solid fa-clock-rotate-left"></i> Atividade Recente
+          </h3>
+          <p class="profile-section-desc">
+            Histórico das últimas ações realizadas na sua conta.
+          </p>
+          <div id="atividadeLista">
+            <!-- Preenchido pelo JS via GET /users/me/activity -->
+            <div class="profile-activity-item">
+              <div
+                class="activity-icon upload skeleton"
+                style="width: 40px; height: 40px; border-radius: 50%"
+              ></div>
+              <div class="activity-text">
+                <div
+                  class="activity-title skeleton"
+                  style="height: 1em; width: 200px"
+                >
+                  ​
+                </div>
+                <div
+                  class="activity-time skeleton"
+                  style="height: 0.8em; width: 120px; margin-top: 6px"
+                >
+                  ​
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ZONA DE PERIGO ── -->
+        <div
+          class="profile-section-card profile-danger-zone"
+          id="section-dados-danger"
+          style="display: block"
+        >
+          <h3 class="profile-section-title danger">
+            <i class="fa-solid fa-triangle-exclamation"></i> Zona de Perigo
+          </h3>
+          <p class="profile-section-desc">
+            Ações irreversíveis. Confirme com cuidado antes de prosseguir.
+          </p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap">
+            <button class="btn-danger" onclick="exportarDados()">
+              <i class="fa-solid fa-download"></i> Exportar meus dados
+            </button>
+            <button
+              class="btn-danger"
+              onclick="confirmarExclusao()"
+              style="
+                border-color: rgba(231, 76, 60, 0.5);
+                background: rgba(231, 76, 60, 0.12);
+              "
+            >
+              <i class="fa-solid fa-user-slash"></i> Excluir conta
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="logo-mark">⬡</span> ENIAC ESG HUB
+        </div>
+        <p class="footer-desc">
+          Comprometidos com um futuro mais justo e conectado.
+        </p>
+        <div class="footer-links">
+          <a href="../index.html">Projetos &amp; Dashboard</a>
+          <a href="./quem-somos.html">Quem Somos</a>
+          <a href="./impactos.html">Impactos e Valores</a>
+        </div>
+        <p class="footer-copy">
+          <i class="fa-regular fa-copyright"></i>
+          <script>
+            document.write(new Date().getFullYear());
+          </script>
+          ENIAC ESG HUB · Todos os direitos reservados
+        </p>
+      </div>
+    </footer>
+
+    <div class="multi-layer-transition" id="transition-container">
+      <div class="layer layer-1"></div>
+      <div class="layer layer-2"></div>
+      <div class="layer layer-3"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         SCRIPTS UTILITÁRIOS (inline — sem acesso a módulos ES)
+    ══════════════════════════════════════════════════════════════ -->
+    <script>
+      // ── Toast ────────────────────────────────────────────────────
+      const TOAST_ICONS = {
+        success: "fa-solid fa-circle-check",
+        info: "fa-solid fa-circle-info",
+        error: "fa-solid fa-circle-xmark",
+        warning: "fa-solid fa-triangle-exclamation",
+      };
+
+      function sileoToast(title, msg = "", type = "info", duration = 4000) {
+        const container = document.getElementById("sileoToastContainer");
+        const toast = document.createElement("div");
+        toast.className = `sileo-toast ${type}`;
+        toast.innerHTML = `
+          <div class="sileo-toast-icon-wrap"><i class="${TOAST_ICONS[type] || TOAST_ICONS.info}"></i></div>
+          <div class="sileo-toast-body">
+            <div class="sileo-toast-title">${title}</div>
+            ${msg ? `<div class="sileo-toast-msg">${msg}</div>` : ""}
+          </div>
+          <button class="sileo-toast-close" onclick="removeToast(this.closest('.sileo-toast'))">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+          <div class="sileo-toast-progress" style="animation-duration:${duration}ms"></div>
+        `;
+        container.appendChild(toast);
+        const timer = setTimeout(() => removeToast(toast), duration);
+        toast._timer = timer;
+        return toast;
+      }
+
+      function removeToast(toast) {
+        if (!toast || toast._removing) return;
+        toast._removing = true;
+        clearTimeout(toast._timer);
+        toast.classList.add("removing");
+        toast.addEventListener("animationend", () => toast.remove(), {
+          once: true,
+        });
+        setTimeout(() => toast.remove(), 350);
+      }
+
+      // ── Loading overlay ──────────────────────────────────────────
+      function showLoading(msg = "Carregando…") {
+        document.getElementById("profileLoadingMsg").textContent = msg;
+        document.getElementById("profileLoadingOverlay").classList.add("show");
+      }
+      function hideLoading() {
+        document
+          .getElementById("profileLoadingOverlay")
+          .classList.remove("show");
+      }
+
+      // ── Remoção de skeleton ──────────────────────────────────────
+      function removeSkeleton(el) {
+        if (el) el.classList.remove("skeleton");
+      }
+
+      // ── Navegação de seções ──────────────────────────────────────
+      const SECTIONS = ["dados", "seguranca", "preferencias", "atividade"];
+
+      function showSection(id, btn) {
+        SECTIONS.forEach((s) => {
+          const el = document.getElementById("section-" + s);
+          if (el) el.style.display = "none";
+        });
+        const target = document.getElementById("section-" + id);
+        if (target) target.style.display = "block";
+
+        const dangerZone = document.getElementById("section-dados-danger");
+        if (dangerZone) {
+          dangerZone.style.display =
+            id === "dados" || id === "seguranca" ? "block" : "none";
+        }
+
+        document
+          .querySelectorAll(".profile-nav-item")
+          .forEach((b) => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+
+        // Carrega atividade só quando a seção for aberta pela primeira vez
+        if (id === "atividade" && !window._atividadeCarregada) {
+          _carregarAtividade();
+        }
+      }
+
+      // ── Avatar ───────────────────────────────────────────────────
+      function triggerAvatarUpload() {
+        document.getElementById("avatarInput").click();
+      }
+
+      function handleAvatarChange(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          sileoToast(
+            "Formato inválido",
+            "Selecione uma imagem (JPG, PNG, WEBP).",
+            "error",
+          );
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const avatarEl = document.getElementById("profileAvatarDisplay");
+          avatarEl.innerHTML = `<img src="${ev.target.result}" alt="Avatar"
+            style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
+          sileoToast(
+            "Foto atualizada!",
+            "Sua imagem de perfil foi alterada.",
+            "success",
+          );
+          // TODO: enviar imagem ao servidor (POST /users/me/avatar) com FormData
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // ── Dados pessoais ───────────────────────────────────────────
+      let _hasChanges = false;
+      let _dadosOriginais = {};
+
+      function markChanged() {
+        if (!_hasChanges) {
+          _hasChanges = true;
+          document.getElementById("dadosActions").style.display = "flex";
+        }
+        const nome = document.getElementById("pf-nome").value.trim();
+        const sobrenome = document.getElementById("pf-sobrenome").value.trim();
+        const email = document.getElementById("pf-email").value.trim();
+        if (nome || sobrenome)
+          document.getElementById("sidebarName").textContent = [nome, sobrenome]
+            .filter(Boolean)
+            .join(" ");
+        if (email) document.getElementById("sidebarEmail").textContent = email;
+      }
+
+      // Chamada pelo módulo ES após carregar dados do servidor
+      window._preencherFormulario = function (user) {
+        const campos = {
+          "pf-nome": user.nome || "",
+          "pf-sobrenome": user.sobrenome || "",
+          "pf-email": user.email || "",
+          "pf-telefone": user.telefone || "",
+          "pf-cargo": user.cargo || "",
+          "pf-departamento": user.departamento || "",
+          "pf-bio": user.bio || "",
+        };
+        Object.entries(campos).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.value = val;
+            el.classList.remove("skeleton");
+          }
+        });
+        _dadosOriginais = { ...campos };
+
+        // Sidebar
+        const displayName =
+          [user.nome, user.sobrenome].filter(Boolean).join(" ") ||
+          user.email ||
+          "Usuário";
+        const nameEl = document.getElementById("sidebarName");
+        nameEl.textContent = displayName;
+        removeSkeleton(nameEl);
+
+        const emailEl = document.getElementById("sidebarEmail");
+        emailEl.textContent = user.email || "";
+        removeSkeleton(emailEl);
+
+        // Badge de role
+        const badge = document.getElementById("sidebarRole");
+        if (user.role === "admin") {
+          badge.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Admin';
+          badge.className = "profile-role-badge admin";
+        } else {
+          badge.innerHTML = '<i class="fa-solid fa-user"></i> Usuário';
+          badge.className = "profile-role-badge user";
+        }
+        removeSkeleton(badge);
+
+        // Stats: tempo como membro
+        const criado = user.criado_em ? new Date(user.criado_em) : null;
+        if (criado) {
+          const meses = Math.floor(
+            (Date.now() - criado) / (1000 * 60 * 60 * 24 * 30),
+          );
+          const statMeses = document.getElementById("statMeses");
+          statMeses.textContent = meses;
+          removeSkeleton(statMeses);
+        }
+        removeSkeleton(document.getElementById("statUploads"));
+        removeSkeleton(document.getElementById("statAtivo"));
+
+        // Preenche preferências se vieram do servidor
+        if (user.preferencias) {
+          Object.entries(user.preferencias).forEach(([k, v]) => {
+            const el = document.getElementById("pref-" + k.replace(/_/g, "-"));
+            if (el) el.checked = !!v;
+          });
+        }
+
+        // Sessão atual
+        const sessaoEl = document.getElementById("sessaoAtualInfo");
+        if (sessaoEl) {
+          const agora = new Date().toLocaleString("pt-BR");
+          sessaoEl.textContent = `Sessão atual · ${agora}`;
+        }
+
+        // Login social: e-mail somente leitura
+        if (user.provider && user.provider !== "email") {
+          const emailInput = document.getElementById("pf-email");
+          emailInput.readOnly = true;
+          emailInput.title =
+            "E-mail vinculado à conta social — não pode ser alterado aqui.";
+          emailInput.style.opacity = "0.6";
+          emailInput.style.cursor = "not-allowed";
+
+          // Esconde seção de senha para contas sociais
+          const secSenha = document.getElementById("secSenhaWrap");
+          if (secSenha) {
+            secSenha.insertAdjacentHTML(
+              "beforebegin",
+              `<div class="profile-section-desc" style="color:rgba(255,215,0,0.7);margin-bottom:16px">
+                <i class="fa-solid fa-circle-info"></i>
+                Sua conta usa login social. A senha é gerenciada pelo provedor (Google/GitHub/LinkedIn).
+               </div>`,
+            );
+            secSenha.style.display = "none";
+          }
+        }
+
+        // Foto de perfil (login social)
+        if (user.photoURL) {
+          const avatarEl = document.getElementById("profileAvatarDisplay");
+          avatarEl.innerHTML = `<img src="${user.photoURL}" alt="Avatar"
+            style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
+        }
+
+        // has-value para ícones
+        document.querySelectorAll(".form-input").forEach((inp) => {
+          inp
+            .closest(".input-wrap")
+            ?.classList.toggle("has-value", inp.value.length > 0);
+        });
+      };
+
+      // ── Salvar dados pessoais ────────────────────────────────────
+      // (chama o módulo ES via window._authSalvarDados injetado abaixo)
+      function salvarDados() {
+        const nome = document.getElementById("pf-nome").value.trim();
+        const sobrenome = document.getElementById("pf-sobrenome").value.trim();
+        const email = document.getElementById("pf-email").value.trim();
+
+        if (!nome || !sobrenome) {
+          sileoToast(
+            "Campos obrigatórios",
+            "Preencha nome e sobrenome.",
+            "warning",
+          );
+          return;
+        }
+        if (!email.includes("@")) {
+          sileoToast("E-mail inválido", "Informe um e-mail válido.", "error");
+          return;
+        }
+
+        const dados = {
+          nome,
+          sobrenome,
+          email,
+          telefone: document.getElementById("pf-telefone").value.trim(),
+          cargo: document.getElementById("pf-cargo").value.trim(),
+          departamento: document.getElementById("pf-departamento").value.trim(),
+          bio: document.getElementById("pf-bio").value.trim(),
+        };
+
+        showLoading("Salvando dados…");
+
+        if (typeof window._authSalvarDados === "function") {
+          window
+            ._authSalvarDados(dados)
+            .then(() => {
+              _hasChanges = false;
+              _dadosOriginais = { ...dados };
+              document.getElementById("dadosActions").style.display = "none";
+              sileoToast(
+                "Perfil salvo!",
+                "Seus dados foram atualizados com sucesso.",
+                "success",
+              );
+            })
+            .catch((err) => {
+              sileoToast(
+                "Erro ao salvar",
+                err.message || "Tente novamente.",
+                "error",
+              );
+            })
+            .finally(hideLoading);
+        } else {
+          hideLoading();
+          sileoToast("Módulo não carregado", "Recarregue a página.", "error");
+        }
+      }
+
+      function cancelarEdicao() {
+        _hasChanges = false;
+        document.getElementById("dadosActions").style.display = "none";
+        // Restaura valores originais
+        Object.entries(_dadosOriginais).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val;
+        });
+        sileoToast(
+          "Edição cancelada",
+          "Nenhuma alteração foi salva.",
+          "info",
+          2500,
+        );
+      }
+
+      // ── Segurança — troca de senha ───────────────────────────────
+      function checkStrengthProfile(val) {
+        const fill = document.getElementById("pwFillProfile");
+        const label = document.getElementById("pwLabelProfile");
+        if (!val) {
+          fill.style.width = "0";
+          label.textContent = "Digite uma nova senha";
+          return;
+        }
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        const levels = [
+          { w: "25%", c: "#e74c3c", l: "Muito fraca" },
+          { w: "50%", c: "#f39c12", l: "Fraca" },
+          { w: "75%", c: "#3498db", l: "Boa" },
+          { w: "100%", c: "#2ecc71", l: "Forte" },
+        ];
+        const lvl = levels[score - 1] || levels[0];
+        fill.style.width = lvl.w;
+        fill.style.background = lvl.c;
+        label.textContent = lvl.l;
+      }
+
+      function salvarSenha() {
+        const atual = document.getElementById("pf-senha-atual").value;
+        const nova = document.getElementById("pf-nova-senha").value;
+        const confirmar = document.getElementById("pf-confirmar-senha").value;
+
+        if (!atual) {
+          sileoToast(
+            "Campo obrigatório",
+            "Informe sua senha atual.",
+            "warning",
+          );
+          return;
+        }
+        if (nova.length < 8) {
+          sileoToast(
+            "Senha muito curta",
+            "A nova senha deve ter ao menos 8 caracteres.",
+            "warning",
+          );
+          return;
+        }
+        if (nova !== confirmar) {
+          sileoToast(
+            "Senhas não coincidem",
+            "Confirme a nova senha corretamente.",
+            "error",
+          );
+          return;
+        }
+
+        const btn = document.getElementById("btnSalvarSenha");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i> Atualizando…';
+
+        if (typeof window._authTrocarSenha === "function") {
+          window
+            ._authTrocarSenha(atual, nova)
+            .then(() => {
+              document.getElementById("pf-senha-atual").value = "";
+              document.getElementById("pf-nova-senha").value = "";
+              document.getElementById("pf-confirmar-senha").value = "";
+              document.getElementById("pwFillProfile").style.width = "0";
+              document.getElementById("pwLabelProfile").textContent =
+                "Digite uma nova senha";
+              sileoToast(
+                "Senha atualizada!",
+                "Sua senha foi alterada com segurança.",
+                "success",
+              );
+            })
+            .catch((err) => {
+              sileoToast(
+                "Erro ao atualizar senha",
+                err.message || "Tente novamente.",
+                "error",
+              );
+            })
+            .finally(() => {
+              btn.disabled = false;
+              btn.innerHTML =
+                '<i class="fa-solid fa-shield-check"></i> Atualizar senha';
+            });
+        } else {
+          btn.disabled = false;
+          btn.innerHTML =
+            '<i class="fa-solid fa-shield-check"></i> Atualizar senha';
+          sileoToast("Módulo não carregado", "Recarregue a página.", "error");
+        }
+      }
+
+      function encerrarOutrasSessoes() {
+        const btn = document.getElementById("btnEncerrarSessoes");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-circle-notch fa-spin"></i> Encerrando…';
+
+        if (typeof window._authRevogarSessoes === "function") {
+          window
+            ._authRevogarSessoes()
+            .then(() => {
+              sileoToast(
+                "Sessões encerradas",
+                "Todos os outros dispositivos foram desconectados.",
+                "success",
+              );
+            })
+            .catch((err) => {
+              sileoToast(
+                "Erro",
+                err.message || "Não foi possível encerrar as sessões.",
+                "error",
+              );
+            })
+            .finally(() => {
+              btn.disabled = false;
+              btn.innerHTML =
+                '<i class="fa-solid fa-right-from-bracket"></i> Encerrar outras sessões';
+            });
+        } else {
+          btn.disabled = false;
+          btn.innerHTML =
+            '<i class="fa-solid fa-right-from-bracket"></i> Encerrar outras sessões';
+          sileoToast("Módulo não carregado", "Recarregue a página.", "error");
+        }
+      }
+
+      // ── Preferências ─────────────────────────────────────────────
+      function salvarPreferencia(key, value) {
+        if (typeof window._authSalvarPreferencia === "function") {
+          window._authSalvarPreferencia(key, value).catch(() => {});
+        }
+        sileoToast(
+          value ? "Preferência ativada" : "Preferência desativada",
+          key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          "info",
+          2500,
+        );
+      }
+
+      // ── Atividade ────────────────────────────────────────────────
+      async function _carregarAtividade() {
+        window._atividadeCarregada = true;
+        const lista = document.getElementById("atividadeLista");
+
+        if (typeof window._authGetToken !== "function") {
+          lista.innerHTML =
+            '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Módulo não carregado.</p>';
+          return;
+        }
+
+        const token = window._authGetToken();
+        if (!token) {
+          lista.innerHTML =
+            '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Não autenticado.</p>';
+          return;
+        }
+
+        try {
+          const res = await fetch(window._authApiBase + "/users/me/activity", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (!res.ok) throw new Error("Sem dados de atividade.");
+
+          const atividades = await res.json();
+          if (!atividades.length) {
+            lista.innerHTML =
+              '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Nenhuma atividade registrada.</p>';
+            return;
+          }
+
+          const iconMap = {
+            upload: { icon: "fa-file-csv", cls: "upload" },
+            view: { icon: "fa-chart-line", cls: "view" },
+            edit: { icon: "fa-pen", cls: "edit" },
+            login: { icon: "fa-arrow-right-to-bracket", cls: "view" },
+          };
+
+          lista.innerHTML = atividades
+            .map((a) => {
+              const type = iconMap[a.tipo] || iconMap.view;
+              const tempo = a.criado_em
+                ? new Date(a.criado_em).toLocaleString("pt-BR")
+                : "—";
+              return `
+              <div class="profile-activity-item">
+                <div class="activity-icon ${type.cls}">
+                  <i class="fa-solid ${type.icon}"></i>
+                </div>
+                <div class="activity-text">
+                  <div class="activity-title">${a.descricao || "Ação registrada"}</div>
+                  <div class="activity-time">${tempo}</div>
+                </div>
+              </div>
+            `;
+            })
+            .join("");
+        } catch (_) {
+          lista.innerHTML =
+            '<p style="color:rgba(255,255,255,0.4);font-size:.85rem">Não foi possível carregar atividades.</p>';
+        }
+      }
+
+      // ── Zona de perigo ───────────────────────────────────────────
+      function exportarDados() {
+        sileoToast(
+          "Exportação iniciada",
+          "Você receberá os dados por e-mail em instantes.",
+          "info",
+        );
+      }
+
+      function confirmarExclusao() {
+        sileoToast(
+          "⚠ Excluir conta?",
+          "Esta ação é permanente e não pode ser desfeita.",
+          "error",
+          8000,
+        );
+      }
+
+      // ── Logout ───────────────────────────────────────────────────
+      function confirmarLogout() {
+        if (typeof window._authLogout !== "function") {
+          // Fallback se módulo não carregou
+          sessionStorage.clear();
+          const container = document.getElementById("transition-container");
+          container.classList.add("active");
+          setTimeout(() => {
+            window.location.href = "./login.html";
+          }, 650);
+          return;
+        }
+
+        // Mostra confirmação antes de sair
+        const t = sileoToast(
+          "Sair da conta?",
+          "Clique novamente em <strong>Sair</strong> para confirmar.",
+          "warning",
+          5000,
+        );
+
+        // Segundo clique confirma — ou simplesmente executamos após toast exibido
+        // Abordagem: modal simples inline
+        const btnArea = document.createElement("div");
+        btnArea.style.cssText = "display:flex;gap:8px;margin-top:10px";
+        btnArea.innerHTML = `
+          <button onclick="window._authLogout(false)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,100,100,0.4);background:rgba(231,76,60,0.15);color:#e74c3c;font-size:.8rem;cursor:pointer;font-family:inherit">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair desta sessão
+          </button>
+          <button onclick="window._authLogout(true)" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(231,76,60,0.6);background:rgba(231,76,60,0.25);color:#e74c3c;font-size:.8rem;cursor:pointer;font-family:inherit">
+            <i class="fa-solid fa-right-from-bracket"></i> Sair de tudo
+          </button>
+        `;
+        const body = t.querySelector(".sileo-toast-body");
+        if (body) body.appendChild(btnArea);
+      }
+
+      // ── Utilitários ──────────────────────────────────────────────
+      function togglePw(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector("i");
+        if (input.type === "password") {
+          input.type = "text";
+          icon.className = "fa-regular fa-eye-slash";
+        } else {
+          input.type = "password";
+          icon.className = "fa-regular fa-eye";
+        }
+      }
+
+      function toggleMenu() {
+        const nav = document.getElementById("menu");
+        const btn = document.querySelector(".menu-btn");
+        const isOpen = nav.classList.toggle("open");
+        if (btn) btn.setAttribute("aria-expanded", isOpen);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".form-input").forEach((input) => {
+          const check = () => {
+            input
+              .closest(".input-wrap")
+              ?.classList.toggle("has-value", input.value.length > 0);
+          };
+          input.addEventListener("input", check);
+          input.addEventListener("change", check);
+          check();
+        });
+
+        document.addEventListener("click", (e) => {
+          const nav = document.getElementById("menu");
+          const btn = document.querySelector(".menu-btn");
+          if (!nav.contains(e.target) && !btn.contains(e.target)) {
+            nav.classList.remove("open");
+          }
+        });
+      });
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         MÓDULO ES — integração real com auth.js
+         Carrega dados do servidor e injeta funções no window.*
+    ══════════════════════════════════════════════════════════════ -->
+    <script type="module">
+      import {
+        fetchMe,
+        getToken,
+        handleLogout,
+        handleChangePassword,
+        handleUpdateProfile,
+        handleUpdatePreference,
+        handleRevokeOtherSessions,
+        isLoggedIn,
+      } from "../js/auth.js";
+
+      import { API_BASE } from "../js/config.js";
+
+      // ── Guarda de autenticação ────────────────────────────────────
+      if (!isLoggedIn()) {
+        // JWT ausente ou expirado → redireciona para login
+        window.location.replace("./login.html");
+      }
+
+      // ── Expõe helpers para os scripts inline ─────────────────────
+      window._authGetToken = getToken;
+      window._authApiBase = API_BASE;
+      window._authLogout = handleLogout;
+      window._authTrocarSenha = handleChangePassword;
+      window._authRevogarSessoes = handleRevokeOtherSessions;
+      window._authSalvarPreferencia = handleUpdatePreference;
+
+      window._authSalvarDados = async function (dados) {
+        return await handleUpdateProfile(dados);
+      };
+
+      // ── Carrega dados do usuário do servidor ──────────────────────
+      try {
+        const user = await fetchMe();
+
+        if (!user) {
+          // Token inválido/expirado — redireciona
+          window.location.replace("./login.html");
+        } else {
+          // Preenche UI com dados reais
+          if (typeof window._preencherFormulario === "function") {
+            window._preencherFormulario(user);
+          }
+
+          // Atualiza mini-stats se o servidor retornar
+          if (user.uploads_total !== undefined) {
+            const el = document.getElementById("statUploads");
+            if (el) {
+              el.textContent = user.uploads_total;
+              el.classList.remove("skeleton");
+            }
+          }
+          if (user.ativo_pct !== undefined) {
+            const el = document.getElementById("statAtivo");
+            if (el) {
+              el.textContent = user.ativo_pct + "%";
+              el.classList.remove("skeleton");
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao carregar perfil:", err);
+        // Remove skeletons para não travar a UI
+        document
+          .querySelectorAll(".skeleton")
+          .forEach((el) => el.classList.remove("skeleton"));
+      }
+    </script>
+  </body>
+</html>
