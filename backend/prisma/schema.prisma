@@ -1,15 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model desafios {
   id                          Int       @id @default(autoincrement())
-  postado                     DateTime? @db.Timestamp(6) @unique
+  postado                     DateTime? @db.Timestamp(6)
   tipo                        String?
   empresa                     String?
   responsavel                 String?
@@ -27,4 +27,14 @@ model desafios {
   impacto_social_indireto_num Int?
   eixo                        String?
   natureza                    String?
+}
+
+model usuarios {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  sobrenome String
+  email     String    @unique
+  senha     String
+  role      String?   @default("user")
+  criado_em DateTime? @default(now()) @db.Timestamp(6)
 }
