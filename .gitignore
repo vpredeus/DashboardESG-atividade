@@ -12,5 +12,3 @@ build/
 
 # Logs
 *.log
-
-/frontend/js/config.js
