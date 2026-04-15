@@ -13,6 +13,21 @@ type CreateUserInput = {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  findAll() {
+    return this.prisma.usuarios.findMany({
+      select: {
+        id: true,
+        nome: true,
+        sobrenome: true,
+        email: true,
+        role: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+  }
+
   findByEmail(email: string) {
     return this.prisma.usuarios.findUnique({
       where: { email: email.toLowerCase().trim() },
